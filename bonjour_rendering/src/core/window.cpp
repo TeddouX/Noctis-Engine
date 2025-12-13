@@ -1,16 +1,16 @@
-#include "bjr/window.hpp"
+#include <core/window.hpp>
+#include <core/bonjour.hpp>
+
 #include <print>
 
 namespace Bjr
 {
 
-Window::Window(int width, int height, const std::string &title, std::shared_ptr<GraphicsCtx> ctx)
-    : m_graphicsCtx(ctx)
-{
-    glfwSetErrorCallback(Window::GLFWErrorCallback);
+Window::Window(int width, int height, const std::string &title) {
     glfwInit();
+    glfwSetErrorCallback(Window::GLFWErrorCallback);
 
-    if (ctx->getBackend() == GraphicsBackend::OPENGL) {
+    if (Bjr::getBackend() == GraphicsBackend::OPENGL) {
         // Opengl 4.6
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -23,7 +23,7 @@ Window::Window(int width, int height, const std::string &title, std::shared_ptr<
     if (!m_glfwWindow) {
         std::println("Failed to create a window.");
         glfwTerminate();
-        return;
+        exit(-1);
     }
 
     glfwSetWindowUserPointer(m_glfwWindow, this);
@@ -32,6 +32,12 @@ Window::Window(int width, int height, const std::string &title, std::shared_ptr<
 
 void Window::GLFWErrorCallback(int code, const char *desc) {
     std::println("glfw error: {}", desc);
+}
+
+Window createContext(int windowWidth, int windowHeight, const std::string &title) {
+    Window window{windowWidth, windowHeight, title};
+    Internal::state.hasContext = true;
+    return window;
 }
 
 } // namespace Bjr
