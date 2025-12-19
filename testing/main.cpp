@@ -1,10 +1,10 @@
-#include <bjr/rendering/shader.hpp>
-#include <bjr/rendering/vertex_array.hpp>
-#include <bjr/rendering/uniform_buffer.hpp>
-#include <bjr/rendering/camera.hpp>
-#include <bjr/rendering/ssbo.hpp>
-#include <bjr/core/window.hpp>
-#include <bjr/core/bonjour.hpp>
+#include <noctis_engine/rendering/shader.hpp>
+#include <noctis_engine/rendering/vertex_array.hpp>
+#include <noctis_engine/rendering/uniform_buffer.hpp>
+#include <noctis_engine/rendering/camera.hpp>
+#include <noctis_engine/rendering/ssbo.hpp>
+#include <noctis_engine/rendering/window.hpp>
+#include <noctis_engine/rendering/render_state.hpp>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -29,12 +29,12 @@ glm::mat4x4 createModelMatrix(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale) {
 }
 
 int main() {
-    Bjr::Window window = Bjr::createContext(800, 600, "Testing");
+    NoctisEngine::Window window = NoctisEngine::create_context(800, 600, "Testing");
     
-    Bjr::init(Bjr::GraphicsBackend::OPENGL);
-    Bjr::setClearScreenColor(Bjr::Color{8, 8, 8, 255});
-    
-    auto shader = Bjr::Shader::Create(
+    auto handler = NoctisEngine::RenderState::init(NoctisEngine::GraphicsBackend::OPENGL);
+    NoctisEngine::RenderState::set_clear_screen_color(NoctisEngine::Color{255, 0, 0, 255});
+
+    auto shader = NoctisEngine::Shader::Create(
         "#version 430 core\n"
         "layout (location = 0) in vec3 aPos;\n"
         "layout (location = 1) in vec3 aNormal;\n"
@@ -52,7 +52,8 @@ int main() {
         "{\n"
         "   gl_Position = camera.projMat * camera.viewMat * models.modelMatrices[modelIdx] * vec4(aPos, 1.0);\n"
         "   Pos = aPos;\n"
-        "}\0", 
+        "}\0",
+
         "#version 430 core\n"
         "in vec3 Pos;\n"
         "out vec4 FragColor;\n"
@@ -65,27 +66,27 @@ int main() {
         "}\n\0"
     );
 
-    Bjr::VertexArrayInfo plane {
+    NoctisEngine::VertexArrayInfo plane {
         .vertices = {
-            Bjr::Vertex(glm::vec3( 0.5f,  0.5f, 0.0f), glm::vec3(0), glm::vec2(0)),
-            Bjr::Vertex(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec3(0), glm::vec2(0)),
-            Bjr::Vertex(glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0), glm::vec3(0)),
-            Bjr::Vertex(glm::vec3( 0.5f, -0.5f, 0.0f), glm::vec3(0), glm::vec2(0)),
+            NoctisEngine::Vertex(glm::vec3( 0.5f,  0.5f, 0.0f), glm::vec3(0), glm::vec2(0)),
+            NoctisEngine::Vertex(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec3(0), glm::vec2(0)),
+            NoctisEngine::Vertex(glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0), glm::vec3(0)),
+            NoctisEngine::Vertex(glm::vec3( 0.5f, -0.5f, 0.0f), glm::vec3(0), glm::vec2(0)),
         },
         .indices = {0, 1, 2, 2, 3, 0}
     };
 
-    Bjr::VertexArrayInfo cube {
+    NoctisEngine::VertexArrayInfo cube {
         .vertices = {
             // Front face
-            Bjr::Vertex(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(0), glm::vec2(0)),
-            Bjr::Vertex(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec3(0), glm::vec2(0)),
-            Bjr::Vertex(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3(0), glm::vec2(0)),
-            Bjr::Vertex(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(0), glm::vec2(0)),
-            Bjr::Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0), glm::vec2(0)),
-            Bjr::Vertex(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3(0), glm::vec2(0)),
-            Bjr::Vertex(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3(0), glm::vec2(0)),
-            Bjr::Vertex(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(0), glm::vec2(0)),
+            NoctisEngine::Vertex(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(0), glm::vec2(0)),
+            NoctisEngine::Vertex(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec3(0), glm::vec2(0)),
+            NoctisEngine::Vertex(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3(0), glm::vec2(0)),
+            NoctisEngine::Vertex(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(0), glm::vec2(0)),
+            NoctisEngine::Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0), glm::vec2(0)),
+            NoctisEngine::Vertex(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3(0), glm::vec2(0)),
+            NoctisEngine::Vertex(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3(0), glm::vec2(0)),
+            NoctisEngine::Vertex(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(0), glm::vec2(0)),
         },
         .indices = {
             // Front
@@ -103,39 +104,39 @@ int main() {
         }
     };
 
-    auto vertArray = Bjr::VertexArray::Create(cube);
-    auto testUB = Bjr::UniformBuffer::Create(1);
+    auto vertArray = NoctisEngine::VertexArray::Create(cube);
+    auto testUB = NoctisEngine::UniformBuffer::Create(1);
 
     glm::vec3 col(0, 0, 0);
-    testUB->uploadData(sizeof(glm::vec3), &col);
+    testUB->upload_data(sizeof(glm::vec3), &col);
 
-    Bjr::Camera cam(glm::vec3(-5, 1, 2), 800/600, 70.f, .1f, 1000.f);
-    cam.rotateBy(-5.f, -10.f);
+    NoctisEngine::Camera cam(glm::vec3(-5, 1, 2), 800/600, 70.f, .1f, 1000.f);
+    cam.rotate_by(-5.f, -10.f);
 
-    auto modelSSBO = Bjr::SSBO::Create(2);
+    auto modelSSBO = NoctisEngine::SSBO::Create(2);
     glm::mat4x4 modelMatrix = createModelMatrix(glm::vec3(0, 1, 0), glm::vec3(0, 90, 0), glm::vec3(1));
-    modelSSBO->uploadData(sizeof(glm::mat4x4), &modelMatrix);
+    modelSSBO->upload_data(sizeof(glm::mat4x4), &modelMatrix);
 
-    while (!window.shouldClose()) {
-        window.pollEvents();
+    while (!window.should_close()) {
+        window.poll_events();
 
-        Bjr::clearScreen();
+        handler->clear_screen();
         
-        double time = window.getTime();
+        double time = window.get_time();
         col.r = static_cast<float>((sin(time + 0.0f) * 0.5f) + 0.5f);
         col.g = static_cast<float>((sin(time + 2.0f) * 0.5f) + 0.5f);
         col.b = static_cast<float>((sin(time + 4.0f) * 0.5f) + 0.5f);
 
         modelMatrix = createModelMatrix(glm::vec3(0, sin(time + 0.0f) * 0.5f, 0), glm::vec3(0, time * 8, 0), glm::vec3(1));
-        modelSSBO->updateData(0, sizeof(glm::mat4x4), &modelMatrix);
+        modelSSBO->update_data(0, sizeof(glm::mat4x4), &modelMatrix);
 
-        testUB->updateData(0, sizeof(glm::vec3), &col);
-        cam.uploadData();
+        testUB->update_data(0, sizeof(glm::vec3), &col);
+        cam.upload_data();
 
         shader->bind();
         vertArray->use();
 
-        window.swapBuffers();
+        window.swap_buffers();
     }
 
     return 0;
