@@ -13,7 +13,10 @@ set(NOCTIS_ENGINE_SOURCES
     # -------------------
     #      Headers
     # -------------------
+    "include/noctis_engine/core/assert.hpp"
+    "include/noctis_engine/core/logging.hpp"
     "include/noctis_engine/input/key.hpp"
+    "include/noctis_engine/input/input_system.hpp"
     "include/noctis_engine/math/color.hpp"
     "include/noctis_engine/rendering/opengl/ogl_handler.hpp"
     "include/noctis_engine/rendering/opengl/ogl_shader.hpp"
@@ -33,6 +36,7 @@ set(NOCTIS_ENGINE_SOURCES
     # -------------------
     #    Source files
     # -------------------
+    "src/input/input_system.cpp"
     "src/rendering/opengl/ogl_handler.cpp"
     "src/rendering/opengl/ogl_shader.cpp"
     "src/rendering/opengl/ogl_ssbo.cpp"

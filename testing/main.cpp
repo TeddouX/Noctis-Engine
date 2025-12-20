@@ -5,6 +5,8 @@
 #include <noctis_engine/rendering/ssbo.hpp>
 #include <noctis_engine/rendering/window.hpp>
 #include <noctis_engine/rendering/render_state.hpp>
+#include <noctis_engine/input/input_system.hpp>
+#include <noctis_engine/core/logging.hpp>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -119,6 +121,9 @@ int main() {
 
     while (!window.should_close()) {
         window.poll_events();
+
+        if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::E))
+            NoctisEngine::Log::Info("E is down");
 
         handler->clear_screen();
         
