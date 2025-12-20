@@ -125,10 +125,10 @@ int main() {
     window.lock_cursor();
 
     while (!window.should_close()) {
-        if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::E))
+        if (NoctisEngine::InputSystem::is_key_pressed(NoctisEngine::Key::E))
             NoctisEngine::Log::Info("E pressed");
 
-        if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::ESCAPE)) {
+        if (NoctisEngine::InputSystem::is_key_pressed(NoctisEngine::Key::ESCAPE)) {
             NoctisEngine::Log::Info("Esc pressed");
             break;
         }

@@ -8,21 +8,24 @@ namespace NoctisEngine
 {
 
 auto InputSystem::is_key_down(Key key) -> bool {
-    return keyStates_[ordinal(key)].state == KeyState::Type::HELD
-        || keyStates_[ordinal(key)].state == KeyState::Type::PRESSED;
+    return keyStates_[ordinal(key)].state == InputState::State::HELD
+        || keyStates_[ordinal(key)].state == InputState::State::PRESSED;
 }
 
 auto InputSystem::is_key_up(Key key) -> bool {
-    return keyStates_[ordinal(key)].state == KeyState::Type::UP;
+    return keyStates_[ordinal(key)].state == InputState::State::UP;
 }
 
 auto InputSystem::is_key_held(Key key) -> bool {
-    return keyStates_[ordinal(key)].state == KeyState::Type::HELD;
-
+    return keyStates_[ordinal(key)].state == InputState::State::HELD;
 }
 
 auto InputSystem::is_key_pressed(Key key) -> bool {
-    return keyStates_[ordinal(key)].state == KeyState::Type::PRESSED;
+    return keyStates_[ordinal(key)].state == InputState::State::PRESSED;
+}
+
+auto InputSystem::is_key_released(Key key) -> bool {
+    return keyStates_[ordinal(key)].state == InputState::State::RELEASED;
 }
 
 auto InputSystem::get_key_modifiers(Key key) -> Modifier {
@@ -34,25 +37,19 @@ auto InputSystem::get_mouse_mouvement() -> MouseMouvement {
 }
 
 auto InputSystem::is_mouse_button_down(MouseButton mb) -> bool {
-    return mouseButtons_[static_cast<size_t>(mb)].state == KeyState::Type::PRESSED;
+    return mouseButtons_[static_cast<size_t>(mb)].state == InputState::State::PRESSED;
 }
 
 auto InputSystem::update() -> void {
-    for (size_t key : releasedKeys_) {
-        keyStates_[key] = KeyState{
-            .state = KeyState::Type::UP,
-            .mods = Modifier::NONE,
-        };
+    for (size_t i = 0; i < keyStates_.size(); i++) {
+        InputState &state = keyStates_[i];
+        update_state(state);
     }
-    releasedKeys_.clear();
 
-    for (size_t mouseBtn : releasedMouseBtns_) {
-        mouseButtons_[mouseBtn] = KeyState {
-            .state = KeyState::Type::UP,
-            .mods = Modifier::NONE,
-        };
+    for (size_t i = 0; i < mouseButtons_.size(); i++) {
+        InputState &state = keyStates_[i];
+        update_state(state);
     }
-    releasedMouseBtns_.clear();
 
     lastMouseMvt_.xDelta = 0;
     lastMouseMvt_.yDelta = 0;
@@ -66,19 +63,16 @@ auto InputSystem::GLFWKeyCallback(GLFWwindow* window, int key, int scancode, int
         return;
 
     size_t keyOrd = ordinal(keyy);
-    KeyState::Type keyState = KeyState::Type::UP;
+    InputState::State keyState = InputState::State::UP;
     
     if (action == GLFW_PRESS && InputSystem::is_key_up(keyy))
-        keyState = KeyState::Type::PRESSED;
+        keyState = InputState::State::PRESSED;
     else if (action == GLFW_REPEAT)
-        keyState = KeyState::Type::HELD;
-    else if (action == GLFW_RELEASE) {
-        keyState = KeyState::Type::RELEASED;
+        keyState = InputState::State::HELD;
+    else if (action == GLFW_RELEASE)
+        keyState = InputState::State::RELEASED;
 
-        releasedKeys_.push_back(keyOrd);
-    }
-
-    keyStates_[keyOrd] = KeyState{
+    keyStates_[keyOrd] = InputState{
         .state = keyState,
         .mods = modss,
     };
@@ -101,14 +95,11 @@ auto InputSystem::GLFWMouseButtonCallback(GLFWwindow *window, int button, int ac
 
     size_t btnOrd = static_cast<size_t>(btn);
 
-    KeyState::Type btnState = KeyState::Type::PRESSED;
-    if (action == GLFW_RELEASE) {
-        btnState = KeyState::Type::RELEASED;
+    InputState::State btnState = InputState::State::PRESSED;
+    if (action == GLFW_RELEASE)
+        btnState = InputState::State::RELEASED;
 
-        releasedMouseBtns_.push_back(btnOrd);
-    }
-
-    mouseButtons_[btnOrd] = KeyState {
+    mouseButtons_[btnOrd] = InputState {
         .state = btnState,
         .mods = modss,
     };
@@ -118,6 +109,19 @@ auto InputSystem::check_key(Key key) -> bool {
     size_t keyOrd = ordinal(key);
     return ensure(keyOrd < keyStates_.size(), "Invalid key: {}", keyOrd);
 }
+
+auto InputSystem::update_state(InputState &state) -> void {
+    if (state.state == InputState::State::UP || state.state == InputState::State::HELD)
+        return;
+    
+    if (state.state == InputState::State::RELEASED) {
+        state.state = InputState::State::UP;
+        state.mods = Modifier::NONE;
+    }
+    else if (state.state == InputState::State::PRESSED)
+        state.state = InputState::State::HELD;
+}
+
 
 } // namespace NoctisEngine
 
