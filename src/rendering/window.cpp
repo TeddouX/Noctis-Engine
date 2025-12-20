@@ -9,7 +9,9 @@
 namespace NoctisEngine
 {
 
-Window::Window(int width, int height, const std::string &title) {
+Window::Window(int width, int height, const std::string &title) 
+    : deltaTime_(0.0), lastFrame_(0.0)
+{
     glfwInit();
     glfwSetErrorCallback(Window::GLFWErrorCallback);
 
@@ -29,7 +31,7 @@ Window::Window(int width, int height, const std::string &title) {
         glfwTerminate();
         std::terminate();
     }
-    
+
     glfwSetKeyCallback(m_glfwWindow, InputSystem::GLFWKeyCallback);
     glfwSetMouseButtonCallback(m_glfwWindow, InputSystem::GLFWMouseButtonCallback);
     glfwSetCursorPosCallback(m_glfwWindow, InputSystem::GLFWCursorPosCallback);
@@ -38,11 +40,15 @@ Window::Window(int width, int height, const std::string &title) {
     glfwMakeContextCurrent(m_glfwWindow);
 }
 
-auto Window::poll_events() const -> void {
+auto Window::poll_events() -> void {
     // Set released keys to up
     InputSystem::update();
-
+    
     glfwPollEvents();
+
+    double currentFrame = glfwGetTime();
+	deltaTime_ = currentFrame - lastFrame_;
+	lastFrame_ = currentFrame;
 }
 
 void Window::GLFWErrorCallback(int code, const char *desc) {

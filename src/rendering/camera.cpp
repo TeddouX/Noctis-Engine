@@ -1,17 +1,20 @@
 #include <rendering/camera.hpp>
-#include <rendering/uniform_buffer.hpp>
+
 #include <glm/gtc/matrix_transform.hpp>
+
+#include <rendering/uniform_buffer.hpp>
+#include <core/logging.hpp>
 
 namespace NoctisEngine
 {
 
 constexpr glm::vec3 WORLD_UP{0, 1, 0};
 
-static auto create_forward_vec(float yaw, float pitch) -> glm::vec3 {
+static auto create_forward_vec(float yawRad, float pitchRad) -> glm::vec3 {
     return glm::normalize(glm::vec3{
-        glm::cos(yaw) * glm::cos(pitch), 
-        glm::sin(pitch), 
-        glm::sin(yaw) * glm::cos(pitch)
+        glm::cos(yawRad) * glm::cos(pitchRad), 
+        glm::sin(pitchRad), 
+        glm::sin(yawRad) * glm::cos(pitchRad)
     });
 }
 
@@ -25,7 +28,7 @@ Camera::Camera(glm::vec3 pos,
     near_(near), 
     far_(far),
     yaw_(0.0f), 
-    pitch_(glm::radians(90.0f)),
+    pitch_(0.0f),
     up_(WORLD_UP),
     forward_(glm::vec3{0}),
     right_(glm::normalize(glm::cross(forward_, up_)))
@@ -41,11 +44,11 @@ void Camera::rotate_by_clamped(float yaw, float pitch) {
     pitch_ += pitch;
 
     if (pitch_ > 89.0f)
-		pitch_ = 89.0f;
-	if (pitch_ < -89.0f)
-		pitch_ = -89.0f;
+        pitch_ = 89.0f;
+    else if (pitch_ < -89.0f)
+        pitch_ = -89.0f;
 
-    forward_ = create_forward_vec(yaw_, pitch_);
+    forward_ = create_forward_vec(glm::radians(yaw_), glm::radians(pitch_));
     right_ = glm::normalize(glm::cross(forward_, WORLD_UP));
     up_ = glm::normalize(glm::cross(right_, forward_));
 

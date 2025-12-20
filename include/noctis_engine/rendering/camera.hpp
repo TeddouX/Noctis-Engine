@@ -40,6 +40,7 @@ private:
     float fov_;
     float aspectRatio_;
     float near_, far_;
+    // In degrees
     float yaw_, pitch_;
 
     struct Data {

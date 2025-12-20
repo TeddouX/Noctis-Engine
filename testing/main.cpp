@@ -14,8 +14,8 @@
 
 #include <print>
 
-constexpr float MOUSE_SENS = 1.0f/100.0f;
-constexpr float CAM_SPEED = 1.0f/10.0f;
+constexpr float MOUSE_SENS = 1.0f/10.0f;
+constexpr float CAM_SPEED = 2.5f;
 
 glm::mat4x4 createModelMatrix(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale) {
     // Identity
@@ -125,8 +125,6 @@ int main() {
     window.lock_cursor();
 
     while (!window.should_close()) {
-        window.poll_events();
-        
         if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::E))
             NoctisEngine::Log::Info("E pressed");
 
@@ -140,16 +138,18 @@ int main() {
         NoctisEngine::MouseMouvement mouseMvt = NoctisEngine::InputSystem::get_mouse_mouvement();
         cam.rotate_by_clamped(mouseMvt.xDelta * MOUSE_SENS, -mouseMvt.yDelta * MOUSE_SENS);
 
+        float dt = static_cast<float>(window.delta_time());
+
         auto forward = cam.forward();
         auto right = cam.right();
         if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::W))
-            cam.translate_by(forward * CAM_SPEED);
+            cam.translate_by(forward * CAM_SPEED * dt);
         if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::S))
-            cam.translate_by(-forward * CAM_SPEED);
+            cam.translate_by(-forward * CAM_SPEED * dt);
         if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::A))
-            cam.translate_by(-right * CAM_SPEED);
+            cam.translate_by(-right * CAM_SPEED * dt);
         if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::D))
-            cam.translate_by(right * CAM_SPEED);
+            cam.translate_by(right * CAM_SPEED * dt);
 
         double time = window.get_time();
         col.r = static_cast<float>((sin(time + 0.0f) * 0.5f) + 0.5f);
@@ -165,6 +165,7 @@ int main() {
         shader->bind();
         vertArray->use();
 
+        window.poll_events();
         window.swap_buffers();
     }
 

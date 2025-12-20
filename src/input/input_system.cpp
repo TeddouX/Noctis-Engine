@@ -44,6 +44,7 @@ auto InputSystem::update() -> void {
             .mods = Modifier::NONE,
         };
     }
+    releasedKeys_.clear();
 
     for (size_t mouseBtn : releasedMouseBtns_) {
         mouseButtons_[mouseBtn] = KeyState {
@@ -51,6 +52,7 @@ auto InputSystem::update() -> void {
             .mods = Modifier::NONE,
         };
     }
+    releasedMouseBtns_.clear();
 
     lastMouseMvt_.xDelta = 0;
     lastMouseMvt_.yDelta = 0;
@@ -65,10 +67,6 @@ auto InputSystem::GLFWKeyCallback(GLFWwindow* window, int key, int scancode, int
 
     size_t keyOrd = ordinal(keyy);
     KeyState::Type keyState = KeyState::Type::UP;
-
-    const char* actionStr = (action == GLFW_PRESS) ? "PRESS" : 
-                           (action == GLFW_RELEASE) ? "RELEASE" : "REPEAT";
-    printf("CALLBACK: key=%d action=%s\n", key, actionStr);
     
     if (action == GLFW_PRESS && InputSystem::is_key_up(keyy))
         keyState = KeyState::Type::PRESSED;
