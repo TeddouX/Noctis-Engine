@@ -30,7 +30,9 @@ Window::Window(int width, int height, const std::string &title) {
         std::terminate();
     }
     
-    glfwSetKeyCallback(m_glfwWindow, Window::GLFWKeyCallback);
+    glfwSetKeyCallback(m_glfwWindow, InputSystem::GLFWKeyCallback);
+    glfwSetMouseButtonCallback(m_glfwWindow, InputSystem::GLFWMouseButtonCallback);
+    glfwSetCursorPosCallback(m_glfwWindow, InputSystem::GLFWCursorPosCallback);
 
     glfwSetWindowUserPointer(m_glfwWindow, this);
     glfwMakeContextCurrent(m_glfwWindow);
@@ -45,18 +47,6 @@ auto Window::poll_events() const -> void {
 
 void Window::GLFWErrorCallback(int code, const char *desc) {
     Log::Error("GLFW error: {}", desc);
-}
-
-void Window::GLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    Key keyy = static_cast<Key>(key);
-    Modifier modss = static_cast<Modifier>(mods);
-    
-    if (action == GLFW_PRESS && InputSystem::is_key_up(keyy))
-        InputSystem::set_key_pressed(keyy, modss);
-    else if (action == GLFW_REPEAT)
-        InputSystem::set_key_held(keyy, modss);
-    else if (action == GLFW_RELEASE)
-        InputSystem::set_key_released(keyy, modss);
 }
 
 NCENG_API Window create_context(int windowWidth, int windowHeight, const std::string &title) {

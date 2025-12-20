@@ -3,7 +3,10 @@
 #include <vector>
 
 #include "key.hpp"
+#include "mouse.hpp"
 #include "../noctis_engine.hpp"
+
+struct GLFWwindow;
 
 namespace NoctisEngine
 {
@@ -18,6 +21,9 @@ public:
     static auto is_key_pressed(Key key) -> bool;
 
     static auto get_key_modifiers(Key key) -> Modifier;
+
+    static auto get_mouse_mouvement() -> MouseMouvement;
+    static auto is_mouse_button_down(MouseButton mb) -> bool;
 
 private:
     struct KeyState {
@@ -37,13 +43,16 @@ private:
         return v;
     }();
 
-    static auto update() -> void; 
+    inline static std::array<KeyState, NUM_MOUSE_BUTTONS> mouseButtons_;
+    inline static std::vector<size_t> releasedMouseBtns_;
+    inline static MouseMouvement lastMouseMvt_;
 
-    static auto set_key_pressed(Key key, Modifier mods) -> void;
-    static auto set_key_held(Key key, Modifier mods) -> void;
-    static auto set_key_released(Key key, Modifier mods) -> void;
-
+    static auto update() -> void;
     static auto check_key(Key key) -> bool;
+
+    static auto GLFWKeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) -> void;
+    static auto GLFWCursorPosCallback(GLFWwindow *window, double xPos, double yPos) -> void;
+    static auto GLFWMouseButtonCallback(GLFWwindow *window, int button, int action, int mods) -> void;
 
     friend class Window;
 };

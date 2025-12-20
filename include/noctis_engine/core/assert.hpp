@@ -25,7 +25,7 @@ constexpr auto ensure(bool predicate, std::format_string<Args...> msg, Args &&..
         Log::Error("Ensure failed: {}", std::format(msg, std::forward<Args>(args)...));
         Log::Error("Ensure failed: {}", std::stacktrace::current(1));
     }
-
+    
     return predicate;
 }
 

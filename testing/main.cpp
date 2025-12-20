@@ -14,6 +14,9 @@
 
 #include <print>
 
+constexpr float MOUSE_SENS = 1.0f/100.0f;
+constexpr float CAM_SPEED = 1.0f/10.0f;
+
 glm::mat4x4 createModelMatrix(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale) {
     // Identity
     glm::mat4x4 model(1);
@@ -34,7 +37,7 @@ int main() {
     NoctisEngine::Window window = NoctisEngine::create_context(800, 600, "Testing");
     
     auto handler = NoctisEngine::RenderState::init(NoctisEngine::GraphicsBackend::OPENGL);
-    NoctisEngine::RenderState::set_clear_screen_color(NoctisEngine::Color{255, 0, 0, 255});
+    NoctisEngine::RenderState::set_clear_screen_color(NoctisEngine::Color{9, 9, 9, 255});
 
     auto shader = NoctisEngine::Shader::Create(
         "#version 430 core\n"
@@ -109,24 +112,45 @@ int main() {
     auto vertArray = NoctisEngine::VertexArray::Create(cube);
     auto testUB = NoctisEngine::UniformBuffer::Create(1);
 
-    glm::vec3 col(0, 0, 0);
+    glm::vec3 col(0);
     testUB->upload_data(sizeof(glm::vec3), &col);
 
     NoctisEngine::Camera cam(glm::vec3(-5, 1, 2), 800/600, 70.f, .1f, 1000.f);
-    cam.rotate_by(-5.f, -10.f);
+    // cam.rotate_by(-5.f, -10.f);
 
     auto modelSSBO = NoctisEngine::SSBO::Create(2);
     glm::mat4x4 modelMatrix = createModelMatrix(glm::vec3(0, 1, 0), glm::vec3(0, 90, 0), glm::vec3(1));
     modelSSBO->upload_data(sizeof(glm::mat4x4), &modelMatrix);
 
+    window.lock_cursor();
+
     while (!window.should_close()) {
         window.poll_events();
-
+        
         if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::E))
-            NoctisEngine::Log::Info("E is down");
+            NoctisEngine::Log::Info("E pressed");
+
+        if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::ESCAPE)) {
+            NoctisEngine::Log::Info("Esc pressed");
+            break;
+        }
 
         handler->clear_screen();
         
+        NoctisEngine::MouseMouvement mouseMvt = NoctisEngine::InputSystem::get_mouse_mouvement();
+        cam.rotate_by_clamped(mouseMvt.xDelta * MOUSE_SENS, -mouseMvt.yDelta * MOUSE_SENS);
+
+        auto forward = cam.forward();
+        auto right = cam.right();
+        if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::W))
+            cam.translate_by(forward * CAM_SPEED);
+        if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::S))
+            cam.translate_by(-forward * CAM_SPEED);
+        if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::A))
+            cam.translate_by(-right * CAM_SPEED);
+        if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::D))
+            cam.translate_by(right * CAM_SPEED);
+
         double time = window.get_time();
         col.r = static_cast<float>((sin(time + 0.0f) * 0.5f) + 0.5f);
         col.g = static_cast<float>((sin(time + 2.0f) * 0.5f) + 0.5f);

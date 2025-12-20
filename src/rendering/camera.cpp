@@ -4,40 +4,74 @@
 
 namespace NoctisEngine
 {
-    
+
+constexpr glm::vec3 WORLD_UP{0, 1, 0};
+
+static auto create_forward_vec(float yaw, float pitch) -> glm::vec3 {
+    return glm::normalize(glm::vec3{
+        glm::cos(yaw) * glm::cos(pitch), 
+        glm::sin(pitch), 
+        glm::sin(yaw) * glm::cos(pitch)
+    });
+}
+
 Camera::Camera(glm::vec3 pos, 
     float aspectRatio, 
     float fov, 
     float near, float far) 
-    : pos_(pos), aspectRatio_(aspectRatio), fov_(fov), near_(near), far_(far)
+    : pos_(pos), 
+    aspectRatio_(aspectRatio), 
+    fov_(fov), 
+    near_(near), 
+    far_(far),
+    yaw_(0.0f), 
+    pitch_(glm::radians(90.0f)),
+    up_(WORLD_UP),
+    forward_(glm::vec3{0}),
+    right_(glm::normalize(glm::cross(forward_, up_)))
 {
     uniformBuffer_ = UniformBuffer::Create(0);
     uniformBuffer_->upload_data(sizeof(Camera::Data), &data_);
+
+    data_.projMat = glm::perspective(glm::radians(fov_), aspectRatio_, near_, far_);
 }
 
-void Camera::rotate_by(float yaw, float pitch) {
+void Camera::rotate_by_clamped(float yaw, float pitch) {
     yaw_ += yaw;
-	pitch_ += pitch;
+    pitch_ += pitch;
 
-	if (pitch_ > 89.0f)
+    if (pitch_ > 89.0f)
 		pitch_ = 89.0f;
 	if (pitch_ < -89.0f)
 		pitch_ = -89.0f;
+
+    forward_ = create_forward_vec(yaw_, pitch_);
+    right_ = glm::normalize(glm::cross(forward_, WORLD_UP));
+    up_ = glm::normalize(glm::cross(right_, forward_));
+
+    update_view_mat();
+}
+
+auto Camera::set_position(glm::vec3 pos) -> void { 
+    pos_ = pos;
+    data_.pos = glm::vec4(pos_, 0);
+
+    update_view_mat(); 
+}
+
+auto Camera::translate_by(glm::vec3 translation) -> void { 
+    pos_ += translation;
+    data_.pos = glm::vec4(pos_, 0);
+
+    update_view_mat(); 
 }
 
 void Camera::upload_data() {
-    data_.projMat = glm::perspective(glm::radians(fov_), aspectRatio_, near_, far_);
-
-    glm::vec3 front(
-        cos(glm::radians(yaw_)) * cos(glm::radians(pitch_)),
-	    sin(glm::radians(pitch_)),
-	    sin(glm::radians(yaw_)) * cos(glm::radians(pitch_))
-    );
-
-    data_.viewMat = glm::lookAt(pos_, glm::normalize(front), glm::vec3(0, 1, 0));
-    data_.pos = glm::vec4(pos_, 0);
-
     uniformBuffer_->update_data(0, sizeof(Camera::Data), &data_);
+}
+
+auto Camera::update_view_mat() -> void {
+    data_.viewMat = glm::lookAt(pos_, pos_ + glm::normalize(forward_), up_);
 }
 
 } // namespace NoctisEngine

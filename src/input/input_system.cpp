@@ -1,4 +1,7 @@
 #include <input/input_system.hpp>
+
+#include <GLFW/glfw3.h>
+
 #include <core/assert.hpp>
 
 namespace NoctisEngine
@@ -26,6 +29,14 @@ auto InputSystem::get_key_modifiers(Key key) -> Modifier {
     return keyStates_[ordinal(key)].mods;
 }
 
+auto InputSystem::get_mouse_mouvement() -> MouseMouvement {
+    return lastMouseMvt_;
+}
+
+auto InputSystem::is_mouse_button_down(MouseButton mb) -> bool {
+    return mouseButtons_[static_cast<size_t>(mb)].state == KeyState::Type::PRESSED;
+}
+
 auto InputSystem::update() -> void {
     for (size_t key : releasedKeys_) {
         keyStates_[key] = KeyState{
@@ -33,40 +44,76 @@ auto InputSystem::update() -> void {
             .mods = Modifier::NONE,
         };
     }
+
+    for (size_t mouseBtn : releasedMouseBtns_) {
+        mouseButtons_[mouseBtn] = KeyState {
+            .state = KeyState::Type::UP,
+            .mods = Modifier::NONE,
+        };
+    }
+
+    lastMouseMvt_.xDelta = 0;
+    lastMouseMvt_.yDelta = 0;
 }
 
-auto InputSystem::set_key_pressed(Key key, Modifier mods) -> void {
-    if (!check_key(key)) 
+auto InputSystem::GLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) -> void {
+    Key keyy = static_cast<Key>(key);
+    Modifier modss = static_cast<Modifier>(mods);
+
+    if (!check_key(keyy)) 
         return;
 
-    keyStates_[ordinal(key)] = KeyState{
-        .state = KeyState::Type::PRESSED,
-        .mods = mods,
-    };
-}
+    size_t keyOrd = ordinal(keyy);
+    KeyState::Type keyState = KeyState::Type::UP;
 
-auto InputSystem::set_key_held(Key key, Modifier mods) -> void {
-    if (!check_key(key)) 
-        return;
+    const char* actionStr = (action == GLFW_PRESS) ? "PRESS" : 
+                           (action == GLFW_RELEASE) ? "RELEASE" : "REPEAT";
+    printf("CALLBACK: key=%d action=%s\n", key, actionStr);
+    
+    if (action == GLFW_PRESS && InputSystem::is_key_up(keyy))
+        keyState = KeyState::Type::PRESSED;
+    else if (action == GLFW_REPEAT)
+        keyState = KeyState::Type::HELD;
+    else if (action == GLFW_RELEASE) {
+        keyState = KeyState::Type::RELEASED;
 
-    keyStates_[ordinal(key)] = KeyState{
-        .state = KeyState::Type::HELD,
-        .mods = mods,
-    };
-}
-
-auto InputSystem::set_key_released(Key key, Modifier mods) -> void {
-    if (!check_key(key)) 
-        return;
-
-    size_t keyOrd = ordinal(key);
+        releasedKeys_.push_back(keyOrd);
+    }
 
     keyStates_[keyOrd] = KeyState{
-        .state = KeyState::Type::RELEASED,
-        .mods = mods,
+        .state = keyState,
+        .mods = modss,
+    };
+}
+
+auto InputSystem::GLFWCursorPosCallback(GLFWwindow *window, double xPos, double yPos) -> void {
+    MouseMouvement mvt {
+        .x = xPos,
+        .y = yPos,
+        .xDelta = xPos - lastMouseMvt_.x,
+        .yDelta = yPos - lastMouseMvt_.y,
     };
 
-    releasedKeys_.push_back(keyOrd);
+    lastMouseMvt_ = mvt;
+}
+
+auto InputSystem::GLFWMouseButtonCallback(GLFWwindow *window, int button, int action, int mods) -> void {
+    MouseButton btn = static_cast<MouseButton>(button);
+    Modifier modss = static_cast<Modifier>(mods);
+
+    size_t btnOrd = static_cast<size_t>(btn);
+
+    KeyState::Type btnState = KeyState::Type::PRESSED;
+    if (action == GLFW_RELEASE) {
+        btnState = KeyState::Type::RELEASED;
+
+        releasedMouseBtns_.push_back(btnOrd);
+    }
+
+    mouseButtons_[btnOrd] = KeyState {
+        .state = btnState,
+        .mods = modss,
+    };
 }
 
 auto InputSystem::check_key(Key key) -> bool {
