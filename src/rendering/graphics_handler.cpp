@@ -1,16 +1,17 @@
-#include <rendering/opengl/ogl_handler.hpp>
+#include <rendering/graphics_handler.hpp>
+
+#include <print>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <print>
-
 #include <rendering/render_state.hpp>
+#include <core/logging.hpp>
 
 namespace NoctisEngine
 {
 
-OpenGLHandler::OpenGLHandler() {
+GraphicsHandler::GraphicsHandler() {
     if (!gladLoadGL()) {
         std::println("Failed to load OpenGL functions.");
         glfwTerminate();
@@ -26,7 +27,7 @@ OpenGLHandler::OpenGLHandler() {
     glDebugMessageCallback(OpenGLDbgMessCallback, nullptr);
 }
 
-void OpenGLHandler::clear_screen() {
+void GraphicsHandler::clear_screen() {
     const Color &color = RenderState::clear_screen_color();
 
     glClearColor(
@@ -39,15 +40,15 @@ void OpenGLHandler::clear_screen() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void OpenGLHandler::OpenGLDbgMessCallback(uint32_t source, uint32_t type, uint32_t id, uint32_t severity,
+void GraphicsHandler::OpenGLDbgMessCallback(uint32_t source, uint32_t type, uint32_t id, uint32_t severity,
         int length, const char* message, const void* userParam
 ) {
     if (severity == GL_DEBUG_SEVERITY_LOW)
-        std::println("OGL Info: {}", message);
+        Log::Info("OpenGL: {}", message);
     else if (severity == GL_DEBUG_SEVERITY_MEDIUM)
-        std::println("OGL Warn: {}", message);
+        Log::Warn("OpenGL: {}", message);
     else if (severity == GL_DEBUG_SEVERITY_HIGH)
-        std::println("OGL Error: {}", message);
+        Log::Error("OpenGL: {}", message);
 }
 
 } // namespace NoctisEngine

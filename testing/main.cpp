@@ -7,6 +7,7 @@
 #include <noctis_engine/rendering/render_state.hpp>
 #include <noctis_engine/input/input_system.hpp>
 #include <noctis_engine/core/logging.hpp>
+#include <noctis_engine/asset/asset_manager.hpp>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -34,12 +35,14 @@ glm::mat4x4 createModelMatrix(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale) {
 }
 
 int main() {
+    auto manager = std::make_unique<NoctisEngine::AssetManager>();
+
     NoctisEngine::Window window = NoctisEngine::create_context(800, 600, "Testing");
     
-    auto handler = NoctisEngine::RenderState::init(NoctisEngine::GraphicsBackend::OPENGL);
+    auto handler = NoctisEngine::RenderState::init();
     NoctisEngine::RenderState::set_clear_screen_color(NoctisEngine::Color{9, 9, 9, 255});
 
-    auto shader = NoctisEngine::Shader::Create(
+    auto shader = NoctisEngine::Shader(
         "#version 430 core\n"
         "layout (location = 0) in vec3 aPos;\n"
         "layout (location = 1) in vec3 aNormal;\n"
@@ -109,20 +112,23 @@ int main() {
         }
     };
 
-    auto vertArray = NoctisEngine::VertexArray::Create(cube);
-    auto testUB = NoctisEngine::UniformBuffer::Create(1);
+    auto vertArray = NoctisEngine::VertexArray(cube);
+    auto testUB = NoctisEngine::UniformBuffer(1);
 
     glm::vec3 col(0);
-    testUB->upload_data(sizeof(glm::vec3), &col);
+    testUB.upload_data(sizeof(glm::vec3), &col);
 
     NoctisEngine::Camera cam(glm::vec3(-5, 1, 2), 800/600, 70.f, .1f, 1000.f);
     // cam.rotate_by(-5.f, -10.f);
 
-    auto modelSSBO = NoctisEngine::SSBO::Create(2);
+    auto modelSSBO = NoctisEngine::SSBO(2);
     glm::mat4x4 modelMatrix = createModelMatrix(glm::vec3(0, 1, 0), glm::vec3(0, 90, 0), glm::vec3(1));
-    modelSSBO->upload_data(sizeof(glm::mat4x4), &modelMatrix);
+    modelSSBO.upload_data(sizeof(glm::mat4x4), &modelMatrix);
 
     window.lock_cursor();
+
+    auto texture = manager->load_asset<NoctisEngine::Texture>("./testing/drone.png");
+    auto texture1 = manager->load_asset<NoctisEngine::Texture>("./testing/drone.png");
 
     while (!window.should_close()) {
         if (NoctisEngine::InputSystem::is_key_pressed(NoctisEngine::Key::E))
@@ -139,6 +145,8 @@ int main() {
         cam.rotate_by_clamped(mouseMvt.xDelta * MOUSE_SENS, -mouseMvt.yDelta * MOUSE_SENS);
 
         float dt = static_cast<float>(window.delta_time());
+
+        // NoctisEngine::Log::Debug("FPS: {}", 1/dt);
 
         auto forward = cam.forward();
         auto right = cam.right();
@@ -157,13 +165,13 @@ int main() {
         col.b = static_cast<float>((sin(time + 4.0f) * 0.5f) + 0.5f);
 
         modelMatrix = createModelMatrix(glm::vec3(0, sin(time + 0.0f) * 0.5f, 0), glm::vec3(0, time * 8, 0), glm::vec3(1));
-        modelSSBO->update_data(0, sizeof(glm::mat4x4), &modelMatrix);
+        modelSSBO.update_data(0, sizeof(glm::mat4x4), &modelMatrix);
 
-        testUB->update_data(0, sizeof(glm::vec3), &col);
+        testUB.update_data(0, sizeof(glm::vec3), &col);
         cam.upload_data();
 
-        shader->bind();
-        vertArray->use();
+        shader.bind();
+        vertArray.use();
 
         window.poll_events();
         window.swap_buffers();

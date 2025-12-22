@@ -1,14 +1,13 @@
 #pragma once
-#include <glm/vec3.hpp>
-#include <glm/vec2.hpp>
+#include <vector>
 
-#include <memory>
+#include <glm/glm.hpp>
 
 #include "../noctis_engine.hpp"
 
 namespace NoctisEngine
 {
-
+    
 struct Vertex {
     glm::vec3 pos;
     glm::vec3 normal;
@@ -25,9 +24,17 @@ struct VertexArrayInfo {
 
 class NCENG_API VertexArray {
 public:
-    static std::unique_ptr<VertexArray> Create(const VertexArrayInfo &info);
+    VertexArray(const VertexArrayInfo &info);
+    ~VertexArray() = default;
 
-    virtual void use() = 0; 
+    void use();
+
+private:
+    uint32_t VAO_;
+    
+    bool isIndexed_;
+    int indicesSize_;
+    int verticesSize_;
 };
 
 } // namespace NoctisEngine

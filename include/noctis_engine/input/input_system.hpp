@@ -38,6 +38,7 @@ private:
     };
 
     inline static std::array<InputState, NUM_KEYS> keyStates_;
+    inline static std::vector<size_t> dirtyKeys_;
 
     inline static std::array<InputState, NUM_MOUSE_BUTTONS> mouseButtons_;
     inline static MouseMouvement lastMouseMvt_;

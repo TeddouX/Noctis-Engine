@@ -1,16 +1,25 @@
 #include <rendering/ssbo.hpp>
 
-#include <rendering/opengl/ogl_ssbo.hpp>
-#include <rendering/render_state.hpp>
+#include <glad/glad.h>
 
 namespace NoctisEngine
 {
     
-std::unique_ptr<SSBO> SSBO::Create(int bindPoint) {
-    switch (RenderState::get_backend()) {
-        case GraphicsBackend::OPENGL: return std::make_unique<SSBOOpenGL>(bindPoint);
-        default: return nullptr;
-    }
+SSBO::SSBO(int bindPoint) {
+    glGenBuffers(1, &ID_);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindPoint, ID_);
 }
-    
+
+void SSBO::upload_data(size_t size, void *data) {
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ID_);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+
+void SSBO::update_data(size_t offset, size_t size, void *data) {
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ID_);
+    glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, size, data);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+
 } // namespace NoctisEngine

@@ -1,5 +1,5 @@
 #pragma once
-#include <memory>
+#include <stdint.h>
 
 #include "../noctis_engine.hpp"
 
@@ -8,12 +8,17 @@ namespace NoctisEngine
     
 class NCENG_API UniformBuffer {
 public:
-    static std::unique_ptr<UniformBuffer> Create(int bindPoint);
-    
-    virtual void rebind(int bind) = 0;
-    // virtual void use() = 0;
-    virtual void upload_data(size_t size, void *data) = 0;
-    virtual void update_data(size_t offset, size_t size, void *data) = 0;
+    UniformBuffer(int bindPoint);
+    ~UniformBuffer() = default;
+
+    void rebind(int bind);
+    void upload_data(size_t size, void *data);
+    void update_data(size_t offset, size_t size, void *data);
+
+private:
+    uint32_t ID_;
+    size_t size_ = 0;
+    int bindPoint_;
 };
 
 } // namespace NoctisEngine

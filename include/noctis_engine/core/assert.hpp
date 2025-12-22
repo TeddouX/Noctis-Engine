@@ -8,7 +8,7 @@ namespace NoctisEngine
 {
     
 template <class... Args>
-constexpr auto assert(bool predicate, std::format_string<Args...> msg, Args &&...args) -> void {
+constexpr auto ensure(bool predicate, std::format_string<Args...> msg, Args &&...args) -> void {
     if (!predicate) {
         Log::Critical("{}", std::format(msg, std::forward<Args>(args)...));
         Log::Critical("{}", std::stacktrace::current(1));
@@ -18,9 +18,9 @@ constexpr auto assert(bool predicate, std::format_string<Args...> msg, Args &&..
     }
 }
 
-// Ensure will not quit the application
+// Expect will not quit the application
 template <class... Args>
-constexpr auto ensure(bool predicate, std::format_string<Args...> msg, Args &&...args) -> bool {
+constexpr auto expect(bool predicate, std::format_string<Args...> msg, Args &&...args) -> bool {
     if (!predicate) {
         Log::Error("Ensure failed: {}", std::format(msg, std::forward<Args>(args)...));
         Log::Error("Ensure failed: {}", std::stacktrace::current(1));

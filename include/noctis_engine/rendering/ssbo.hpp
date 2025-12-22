@@ -1,5 +1,5 @@
 #pragma once
-#include <memory>
+#include <stdint.h>
 
 #include "../noctis_engine.hpp"
 
@@ -8,10 +8,14 @@ namespace NoctisEngine
     
 class NCENG_API SSBO {
 public:
-    static std::unique_ptr<SSBO> Create(int bindPoint);
+    SSBO(int bindPoint);
+    ~SSBO() = default;
 
-    virtual void upload_data(size_t size, void *data) = 0;
-    virtual void update_data(size_t offset, size_t size, void *data) = 0;
+    void upload_data(size_t size, void *data);
+    void update_data(size_t offset, size_t size, void *data);
+
+private:
+    uint32_t ID_;
 };
-
+    
 } // namespace NoctisEngine

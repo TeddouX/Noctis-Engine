@@ -4,8 +4,9 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/glad)
-add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/glm)
 add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/glfw)
+add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/glm)
+add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/stb)
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/testing)
 
@@ -13,21 +14,19 @@ set(NOCTIS_ENGINE_SOURCES
     # -------------------
     #      Headers
     # -------------------
+    "include/noctis_engine/asset/asset_manager.hpp"
+    "include/noctis_engine/asset/loading.hpp"
     "include/noctis_engine/core/assert.hpp"
     "include/noctis_engine/core/logging.hpp"
     "include/noctis_engine/input/key.hpp"
     "include/noctis_engine/input/input_system.hpp"
     "include/noctis_engine/math/color.hpp"
-    "include/noctis_engine/rendering/opengl/ogl_handler.hpp"
-    "include/noctis_engine/rendering/opengl/ogl_shader.hpp"
-    "include/noctis_engine/rendering/opengl/ogl_ssbo.hpp"
-    "include/noctis_engine/rendering/opengl/ogl_uniform_buffer.hpp"
-    "include/noctis_engine/rendering/opengl/ogl_vertex_array.hpp"
     "include/noctis_engine/rendering/camera.hpp"
-    "include/noctis_engine/rendering/handler.hpp"
+    "include/noctis_engine/rendering/graphics_handler.hpp"
     "include/noctis_engine/rendering/render_state.hpp"
     "include/noctis_engine/rendering/shader.hpp"
     "include/noctis_engine/rendering/ssbo.hpp"
+    "include/noctis_engine/rendering/texture.hpp"
     "include/noctis_engine/rendering/uniform_buffer.hpp"
     "include/noctis_engine/rendering/vertex_array.hpp"
     "include/noctis_engine/rendering/window.hpp"
@@ -36,16 +35,14 @@ set(NOCTIS_ENGINE_SOURCES
     # -------------------
     #    Source files
     # -------------------
+    "src/asset/loading.cpp"
     "src/input/input_system.cpp"
-    "src/rendering/opengl/ogl_handler.cpp"
-    "src/rendering/opengl/ogl_shader.cpp"
-    "src/rendering/opengl/ogl_ssbo.cpp"
-    "src/rendering/opengl/ogl_uniform_buffer.cpp"
-    "src/rendering/opengl/ogl_vertex_array.cpp"
     "src/rendering/camera.cpp"
+    "src/rendering/graphics_handler.cpp"
     "src/rendering/render_state.cpp"
     "src/rendering/shader.cpp"
     "src/rendering/ssbo.cpp"
+    "src/rendering/texture.cpp"
     "src/rendering/uniform_buffer.cpp"
     "src/rendering/vertex_array.cpp"
     "src/rendering/window.cpp"
@@ -57,6 +54,7 @@ target_link_libraries(NoctisEngine
     glm::glm
     glfw
     Glad
+    stb
 )
 
 target_compile_definitions(NoctisEngine 

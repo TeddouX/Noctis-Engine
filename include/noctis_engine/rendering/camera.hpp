@@ -5,13 +5,11 @@
 #include <memory>
 
 #include "../noctis_engine.hpp"
+#include "uniform_buffer.hpp"
 
 namespace NoctisEngine
 {
     
-class UniformBuffer;
-class GraphicsCtx;
-
 class NCENG_API Camera {
 public:
     Camera() = default;
@@ -32,7 +30,7 @@ public:
     auto forward() -> glm::vec3 { return forward_; }
 
 private:
-    std::shared_ptr<UniformBuffer> uniformBuffer_;
+    UniformBuffer uniformBuffer_;
     glm::vec3 pos_;
     glm::vec3 up_;
     glm::vec3 right_;

@@ -31,10 +31,10 @@ Camera::Camera(glm::vec3 pos,
     pitch_(0.0f),
     up_(WORLD_UP),
     forward_(glm::vec3{0}),
-    right_(glm::normalize(glm::cross(forward_, up_)))
+    right_(glm::normalize(glm::cross(forward_, up_))),
+    uniformBuffer_(UniformBuffer{0})
 {
-    uniformBuffer_ = UniformBuffer::Create(0);
-    uniformBuffer_->upload_data(sizeof(Camera::Data), &data_);
+    uniformBuffer_.upload_data(sizeof(Camera::Data), &data_);
 
     data_.projMat = glm::perspective(glm::radians(fov_), aspectRatio_, near_, far_);
 }
@@ -70,7 +70,7 @@ auto Camera::translate_by(glm::vec3 translation) -> void {
 }
 
 void Camera::upload_data() {
-    uniformBuffer_->update_data(0, sizeof(Camera::Data), &data_);
+    uniformBuffer_.update_data(0, sizeof(Camera::Data), &data_);
 }
 
 auto Camera::update_view_mat() -> void {

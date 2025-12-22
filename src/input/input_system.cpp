@@ -41,8 +41,8 @@ auto InputSystem::is_mouse_button_down(MouseButton mb) -> bool {
 }
 
 auto InputSystem::update() -> void {
-    for (size_t i = 0; i < keyStates_.size(); i++) {
-        InputState &state = keyStates_[i];
+    for (size_t dirtyKeyOrd : dirtyKeys_) {
+        InputState &state = keyStates_[dirtyKeyOrd];
         update_state(state);
     }
 
@@ -56,6 +56,9 @@ auto InputSystem::update() -> void {
 }
 
 auto InputSystem::GLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) -> void {
+    if (action == GLFW_REPEAT)
+        return;
+
     Key keyy = static_cast<Key>(key);
     Modifier modss = static_cast<Modifier>(mods);
 
@@ -65,12 +68,14 @@ auto InputSystem::GLFWKeyCallback(GLFWwindow* window, int key, int scancode, int
     size_t keyOrd = ordinal(keyy);
     InputState::State keyState = InputState::State::UP;
     
-    if (action == GLFW_PRESS && InputSystem::is_key_up(keyy))
+    if (action == GLFW_PRESS && InputSystem::is_key_up(keyy)) {
         keyState = InputState::State::PRESSED;
-    else if (action == GLFW_REPEAT)
-        keyState = InputState::State::HELD;
-    else if (action == GLFW_RELEASE)
+        dirtyKeys_.push_back(keyOrd);
+    }
+    else if (action == GLFW_RELEASE) {
         keyState = InputState::State::RELEASED;
+        dirtyKeys_.push_back(keyOrd);
+    }
 
     keyStates_[keyOrd] = InputState{
         .state = keyState,
@@ -107,7 +112,7 @@ auto InputSystem::GLFWMouseButtonCallback(GLFWwindow *window, int button, int ac
 
 auto InputSystem::check_key(Key key) -> bool {
     size_t keyOrd = ordinal(key);
-    return ensure(keyOrd < keyStates_.size(), "Invalid key: {}", keyOrd);
+    return expect(keyOrd < keyStates_.size(), "Invalid key: {}", keyOrd);
 }
 
 auto InputSystem::update_state(InputState &state) -> void {
@@ -122,6 +127,4 @@ auto InputSystem::update_state(InputState &state) -> void {
         state.state = InputState::State::HELD;
 }
 
-
 } // namespace NoctisEngine
-
