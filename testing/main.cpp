@@ -45,44 +45,9 @@ int main() {
     handler->set_backface_culling(false);
     handler->set_depth_testing(true);
 
-    auto shader = NoctisEngine::Shader(
-        "#version 430 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "layout (location = 1) in vec3 aNormal;\n"
-        "layout (location = 2) in vec2 aTexCoord;\n"
-        "layout(std140, binding = 0) uniform CameraBuffer {\n"
-        "   mat4 projMat;\n"
-        "   mat4 viewMat;\n"
-        "} camera;\n"
-        "uniform int modelIdx;\n"
-        "layout(std430, binding = 2) buffer ModelMatrices {\n"
-        "   mat4 modelMatrices[];\n"
-        "} models;\n"   
-        "out vec3 Pos;\n"
-        "out vec2 TexCoord;\n"
-        "void main()\n"
-        "{\n"
-        "   gl_Position = camera.projMat * camera.viewMat * models.modelMatrices[modelIdx] * vec4(aPos, 1.0);\n"
-        "   Pos = aPos;\n"
-        "   TexCoord = aTexCoord;\n"
-        "}\0",
+    auto shader = manager->load_asset<NoctisEngine::Shader>("./testing/test_shader.glsl");
 
-        "#version 430 core\n"
-        "in vec3 Pos;\n"
-        "in vec2 TexCoord;\n"
-        "out vec4 FragColor;\n"
-        "uniform sampler2D Drone;"
-        "layout(std140, binding = 1) uniform TestBuffer {\n"
-        "   vec3 col;\n"
-        "} test;\n"
-        "void main()\n"
-        "{\n"
-        //"   FragColor = vec4(test.col, 1.0f);\n"
-        "   FragColor = texture(Drone, TexCoord);\n"
-        "}\n\0"
-    );
-
-    if (!shader.compile())
+    if (!shader->compile())
         return EXIT_FAILURE;
 
     NoctisEngine::VertexArrayInfo plane {
@@ -138,7 +103,7 @@ int main() {
 
     window.lock_cursor();
 
-    auto texture = manager->load_asset<NoctisEngine::Texture>("./testing/drone.png", "Drone");
+    auto texture = manager->load_asset<NoctisEngine::Texture>("./testing/drone.png");
     texture->set_min_function(NoctisEngine::Texture::MinifyingFunction::LINEAR);
     texture->set_mag_function(NoctisEngine::Texture::MagnifyingFunction::LINEAR);
     texture->set_wrap_function(NoctisEngine::Texture::WrapParam::REPEAT, NoctisEngine::Texture::WrapParam::REPEAT);
@@ -183,7 +148,7 @@ int main() {
         testUB.update_data(0, sizeof(glm::vec3), &col);
         cam.upload_data();
 
-        shader.bind();
+        shader->bind();
 
         texture->bind(0, shader);  
 

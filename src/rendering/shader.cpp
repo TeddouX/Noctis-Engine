@@ -9,14 +9,28 @@
 namespace NoctisEngine
 {
     
-Shader::Shader(const char *vertCode, const char *fragCode) {
+Shader::Shader(const std::string &code, const std::string &name) {
     vertShader_ = glCreateShader(GL_VERTEX_SHADER);
     fragShader_ = glCreateShader(GL_FRAGMENT_SHADER);
 
+    glObjectLabel(GL_SHADER, vertShader_, -1, name.c_str());
+    glObjectLabel(GL_SHADER, fragShader_, -1, name.c_str());
+
+    const std::string header = std::string(OPENGL_VERSION) + "\n#define ";
+    const std::string vertCodeStr = header + "VERTEX\n" + code;
+    const std::string fragCodeStr = header + "FRAGMENT\n" + code;
+
+    // Log::Debug("{}", vertCodeStr);
+    // Log::Debug("{}", fragCodeStr);
+
+    const char* vertCode = vertCodeStr.c_str();
+    const char* fragCode = fragCodeStr.c_str();
+    
     glShaderSource(vertShader_, 1, &vertCode, nullptr);
     glShaderSource(fragShader_, 1, &fragCode, nullptr);
     
     programID_ = glCreateProgram();
+    glObjectLabel(GL_PROGRAM, programID_, -1, name.c_str());
 }
 
 auto Shader::compile() -> bool {

@@ -5,6 +5,7 @@
 
 #include "../core/assert.hpp"
 #include "../rendering/texture.hpp"
+#include "../rendering/shader.hpp"
 #include "loading.hpp"
 
 namespace NoctisEngine
@@ -12,6 +13,7 @@ namespace NoctisEngine
 
 constexpr std::string_view PNG_EXTENSION = ".png";
 constexpr std::string_view JPEG_EXTENSION = ".jpeg";
+constexpr std::string_view GLSL_EXTENSION = ".glsl";
 
 class NCENG_API AssetManager {
 public:
@@ -23,8 +25,10 @@ public:
 
 private:
     std::unordered_map<std::filesystem::path, std::shared_ptr<Texture>> textureCache_;
+    std::unordered_map<std::filesystem::path, std::shared_ptr<Shader>>  shaderCache_;
 
     auto load_texture(const std::filesystem::path &path, const std::string &name) -> std::shared_ptr<Texture>;
+    auto load_shader(const std::filesystem::path &path, const std::string &name) -> std::shared_ptr<Shader>;
 };
 
 template <typename AssetType_>
@@ -36,20 +40,28 @@ auto AssetManager::load_asset(const std::filesystem::path &path, const std::stri
 
     const std::string extension = path.extension().string();
     const std::string filename = path.filename().string();
+    const std::string realName = name.empty() ? path.stem().string() : name;
 
-    if (extension == PNG_EXTENSION || extension == JPEG_EXTENSION) {
-        if (!expect(
-            std::is_same_v<AssetType_, Texture>, 
-            "Asset path {} leads to an image and AssetType_ isn't a NoctisEngine::Texture", 
-            path.string()))
+    if constexpr (std::is_same_v<AssetType_, Texture>) {
+        if (extension != PNG_EXTENSION && extension != JPEG_EXTENSION) {
+            Log::Error("{} is not an image", path.string());
             return nullptr;
-        
-        std::string realName = name.empty() ? path.stem().string() : name;
+        }
+
         return load_texture(path, realName);
     }
+    else if constexpr (std::is_same_v<AssetType_, Shader>) {
+        if (extension != GLSL_EXTENSION) {
+            Log::Error("{} is not a shader", path.string());
+            return nullptr;
+        }
 
-    Log::Error("{} This type of asset is not currently supported.", filename);
-    return nullptr;
+        return load_shader(path, realName);
+    }
+    else {
+        static_assert(false, "Unsupported AssetType_ passed to AssetManager::load_asset");
+        return nullptr;
+    }
 }
 
 } // namespace NoctisEngine

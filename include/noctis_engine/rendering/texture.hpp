@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <string>
+#include <memory>
 
 #include "../noctis_engine.hpp"
 #include "shader.hpp"
@@ -43,7 +44,7 @@ public:
     ~Texture();
 
     // The shader must be bound before calling this function!!
-    auto bind(int bindPoint, const Shader &shader) const -> void;
+    auto bind(int bindPoint, const std::shared_ptr<Shader> &shader) const -> void;
 
     auto set_min_function(MinifyingFunction param) const -> void;
     auto set_mag_function(MagnifyingFunction param) const -> void;

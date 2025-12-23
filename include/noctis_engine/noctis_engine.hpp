@@ -14,3 +14,10 @@
 #else
 #   define NCENG_API
 #endif
+
+namespace NoctisEngine
+{
+
+constexpr const char *OPENGL_VERSION = "#version 460 core";
+
+} // namespace NoctisEngine

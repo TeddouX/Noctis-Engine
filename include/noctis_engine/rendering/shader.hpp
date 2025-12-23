@@ -17,7 +17,7 @@ struct UniformInfo {
 
 class NCENG_API Shader {
 public:
-    Shader(const char *vertCode, const char *fragCode);
+    Shader(const std::string &code, const std::string &name);
     ~Shader() = default;
 
     auto compile() -> bool;
