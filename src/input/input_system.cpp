@@ -46,10 +46,10 @@ auto InputSystem::update() -> void {
         update_state(state);
     }
 
-    for (size_t i = 0; i < mouseButtons_.size(); i++) {
-        InputState &state = keyStates_[i];
+    dirtyKeys_.clear();
+
+    for (InputState &state : keyStates_)
         update_state(state);
-    }
 
     lastMouseMvt_.xDelta = 0;
     lastMouseMvt_.yDelta = 0;

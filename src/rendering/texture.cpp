@@ -16,6 +16,7 @@ Texture::Texture(TextureInfo texInfo)
         return;
 
     ::glBindTexture(GL_TEXTURE_2D, texId_);
+    ::glObjectLabel(GL_TEXTURE, texId_, -1, name_.c_str());
 
     // TODO: make this controllable
     ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -59,8 +60,33 @@ Texture::~Texture() {
 }
 
 auto Texture::bind(int bindPoint, const Shader &shader) const -> void {
+    shader.set_uniform(UniformInfo{
+        .type = UniformType::INT,
+        .name = name_,
+        .val = bindPoint,
+    });
+
     ::glActiveTexture(GL_TEXTURE0 + bindPoint);
     ::glBindTexture(GL_TEXTURE_2D, texId_);
+}
+
+auto Texture::set_min_function(MinifyingFunction param) const -> void {
+    ::glBindTexture(GL_TEXTURE_2D, texId_);
+    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, static_cast<GLint>(param));
+    ::glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+auto Texture::set_mag_function(MagnifyingFunction param) const -> void {
+    ::glBindTexture(GL_TEXTURE_2D, texId_);
+    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, static_cast<GLint>(param));
+    ::glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+auto Texture::set_wrap_function(WrapParam paramU, WrapParam paramV) const -> void {
+    ::glBindTexture(GL_TEXTURE_2D, texId_);
+    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, static_cast<GLint>(paramU));
+    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, static_cast<GLint>(paramV));
+    ::glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 } // namespace NoctisEngine

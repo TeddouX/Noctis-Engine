@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #include "../noctis_engine.hpp"
+#include "../math/color.hpp"
 
 namespace NoctisEngine
 {
@@ -11,7 +12,9 @@ public:
     GraphicsHandler();
     ~GraphicsHandler() = default;
 
-    void clear_screen();
+    void clear_screen() const;
+    auto set_backface_culling(bool b) const -> void;
+    auto set_depth_testing(bool b) const -> void;
 
 private:
     static void OpenGLDbgMessCallback(uint32_t source, uint32_t type, uint32_t id, uint32_t severity,

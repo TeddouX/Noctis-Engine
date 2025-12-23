@@ -20,11 +20,13 @@ public:
     Shader(const char *vertCode, const char *fragCode);
     ~Shader() = default;
 
-    void bind();
-    void set_uniform(const UniformInfo &info);
+    auto compile() -> bool;
+    auto bind() -> void;
+    auto set_uniform(const UniformInfo &info) const -> bool;
 
 private:
     uint32_t programID_;
+    uint32_t vertShader_, fragShader_;
 };
 
 } // namespace NoctisEngine

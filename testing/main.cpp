@@ -42,6 +42,9 @@ int main() {
     auto handler = NoctisEngine::RenderState::init();
     NoctisEngine::RenderState::set_clear_screen_color(NoctisEngine::Color{9, 9, 9, 255});
 
+    handler->set_backface_culling(false);
+    handler->set_depth_testing(true);
+
     auto shader = NoctisEngine::Shader(
         "#version 430 core\n"
         "layout (location = 0) in vec3 aPos;\n"
@@ -56,30 +59,38 @@ int main() {
         "   mat4 modelMatrices[];\n"
         "} models;\n"   
         "out vec3 Pos;\n"
+        "out vec2 TexCoord;\n"
         "void main()\n"
         "{\n"
         "   gl_Position = camera.projMat * camera.viewMat * models.modelMatrices[modelIdx] * vec4(aPos, 1.0);\n"
         "   Pos = aPos;\n"
+        "   TexCoord = aTexCoord;\n"
         "}\0",
 
         "#version 430 core\n"
         "in vec3 Pos;\n"
+        "in vec2 TexCoord;\n"
         "out vec4 FragColor;\n"
+        "uniform sampler2D Drone;"
         "layout(std140, binding = 1) uniform TestBuffer {\n"
         "   vec3 col;\n"
         "} test;\n"
         "void main()\n"
         "{\n"
-        "   FragColor = vec4(test.col, 1.0f);\n"
+        //"   FragColor = vec4(test.col, 1.0f);\n"
+        "   FragColor = texture(Drone, TexCoord);\n"
         "}\n\0"
     );
 
+    if (!shader.compile())
+        return EXIT_FAILURE;
+
     NoctisEngine::VertexArrayInfo plane {
         .vertices = {
-            NoctisEngine::Vertex(glm::vec3( 0.5f,  0.5f, 0.0f), glm::vec3(0), glm::vec2(0)),
-            NoctisEngine::Vertex(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec3(0), glm::vec2(0)),
+            NoctisEngine::Vertex(glm::vec3( 0.5f,  0.5f, 0.0f), glm::vec3(0), glm::vec2(1, 1)),
+            NoctisEngine::Vertex(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec3(0), glm::vec2(1, 0)),
             NoctisEngine::Vertex(glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0), glm::vec3(0)),
-            NoctisEngine::Vertex(glm::vec3( 0.5f, -0.5f, 0.0f), glm::vec3(0), glm::vec2(0)),
+            NoctisEngine::Vertex(glm::vec3( 0.5f, -0.5f, 0.0f), glm::vec3(0), glm::vec2(0, 1)),
         },
         .indices = {0, 1, 2, 2, 3, 0}
     };
@@ -112,7 +123,7 @@ int main() {
         }
     };
 
-    auto vertArray = NoctisEngine::VertexArray(cube);
+    auto vertArray = NoctisEngine::VertexArray(plane);
     auto testUB = NoctisEngine::UniformBuffer(1);
 
     glm::vec3 col(0);
@@ -127,8 +138,10 @@ int main() {
 
     window.lock_cursor();
 
-    auto texture = manager->load_asset<NoctisEngine::Texture>("./testing/drone.png");
-    auto texture1 = manager->load_asset<NoctisEngine::Texture>("./testing/drone.png");
+    auto texture = manager->load_asset<NoctisEngine::Texture>("./testing/drone.png", "Drone");
+    texture->set_min_function(NoctisEngine::Texture::MinifyingFunction::LINEAR);
+    texture->set_mag_function(NoctisEngine::Texture::MagnifyingFunction::LINEAR);
+    texture->set_wrap_function(NoctisEngine::Texture::WrapParam::REPEAT, NoctisEngine::Texture::WrapParam::REPEAT);
 
     while (!window.should_close()) {
         if (NoctisEngine::InputSystem::is_key_pressed(NoctisEngine::Key::E))
@@ -171,6 +184,9 @@ int main() {
         cam.upload_data();
 
         shader.bind();
+
+        texture->bind(0, shader);  
+
         vertArray.use();
 
         window.poll_events();

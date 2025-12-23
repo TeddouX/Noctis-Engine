@@ -8,6 +8,8 @@
 #include <rendering/render_state.hpp>
 #include <core/logging.hpp>
 
+#define GLAD_ENABLE_DISABLE(name) if (b) glEnable(name); else glDisable(name)
+
 namespace NoctisEngine
 {
 
@@ -27,7 +29,15 @@ GraphicsHandler::GraphicsHandler() {
     glDebugMessageCallback(OpenGLDbgMessCallback, nullptr);
 }
 
-void GraphicsHandler::clear_screen() {
+auto GraphicsHandler::set_backface_culling(bool b) const -> void {
+    GLAD_ENABLE_DISABLE(GL_CULL_FACE);
+}
+
+auto GraphicsHandler::set_depth_testing(bool b) const -> void {
+    GLAD_ENABLE_DISABLE(GL_DEPTH_TEST);
+}
+
+void GraphicsHandler::clear_screen() const {
     const Color &color = RenderState::clear_screen_color();
 
     glClearColor(

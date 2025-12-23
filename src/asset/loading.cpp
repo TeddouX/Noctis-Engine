@@ -7,7 +7,7 @@
 namespace NoctisEngine::Internal
 {
     
-NCENG_API std::unique_ptr<Texture> load_texture(const std::filesystem::path &path) {
+NCENG_API std::unique_ptr<Texture> load_texture(const std::filesystem::path &path, const std::string &name) {
     int width, height;
     int nrChannels;
 
@@ -31,6 +31,7 @@ NCENG_API std::unique_ptr<Texture> load_texture(const std::filesystem::path &pat
         .data = data,
         .width = width, .height = height,
         .nrChannels = nrChannels,
+        .name = name
     };
 
     auto tex = std::make_unique<Texture>(texInfo);

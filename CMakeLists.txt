@@ -29,6 +29,7 @@ set(NOCTIS_ENGINE_SOURCES
     "include/noctis_engine/rendering/texture.hpp"
     "include/noctis_engine/rendering/uniform_buffer.hpp"
     "include/noctis_engine/rendering/vertex_array.hpp"
+    "include/noctis_engine/rendering/vertex.hpp"
     "include/noctis_engine/rendering/window.hpp"
     "include/noctis_engine/noctis_engine.hpp"
 
@@ -36,6 +37,7 @@ set(NOCTIS_ENGINE_SOURCES
     #    Source files
     # -------------------
     "src/asset/loading.cpp"
+    "src/asset/asset_manager.cpp"
     "src/input/input_system.cpp"
     "src/rendering/camera.cpp"
     "src/rendering/graphics_handler.cpp"
