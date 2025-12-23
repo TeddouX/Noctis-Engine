@@ -29,6 +29,9 @@ public:
     auto right() -> glm::vec3 { return right_; }
     auto forward() -> glm::vec3 { return forward_; }
 
+    auto yaw() -> float { return yaw_; }
+    auto pitch() -> float { return pitch_; }
+
 private:
     UniformBuffer uniformBuffer_;
     glm::vec3 pos_;

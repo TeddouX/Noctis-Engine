@@ -84,14 +84,27 @@ auto InputSystem::GLFWKeyCallback(GLFWwindow* window, int key, int scancode, int
 }
 
 auto InputSystem::GLFWCursorPosCallback(GLFWwindow *window, double xPos, double yPos) -> void {
-    MouseMouvement mvt {
+    static bool firstMouseMvt = true;
+
+    if (firstMouseMvt) {
+        lastMouseMvt_ = {
+            .x = xPos,
+            .y = yPos,
+            .xDelta = 0.0,
+            .yDelta = 0.0
+        };
+
+        firstMouseMvt = false;
+
+        return;
+    }
+
+    lastMouseMvt_ = {
         .x = xPos,
         .y = yPos,
         .xDelta = xPos - lastMouseMvt_.x,
         .yDelta = yPos - lastMouseMvt_.y,
     };
-
-    lastMouseMvt_ = mvt;
 }
 
 auto InputSystem::GLFWMouseButtonCallback(GLFWwindow *window, int button, int action, int mods) -> void {

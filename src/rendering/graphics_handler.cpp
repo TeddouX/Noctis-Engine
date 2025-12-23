@@ -8,10 +8,13 @@
 #include <rendering/render_state.hpp>
 #include <core/logging.hpp>
 
-#define GLAD_ENABLE_DISABLE(name) if (b) glEnable(name); else glDisable(name)
-
 namespace NoctisEngine
 {
+
+static auto glad_enable_disable(bool b, GLenum name) -> void {
+    if (b) glEnable(name);
+    else   glDisable(name);
+}
 
 GraphicsHandler::GraphicsHandler() {
     if (!gladLoadGL()) {
@@ -30,11 +33,11 @@ GraphicsHandler::GraphicsHandler() {
 }
 
 auto GraphicsHandler::set_backface_culling(bool b) const -> void {
-    GLAD_ENABLE_DISABLE(GL_CULL_FACE);
+    glad_enable_disable(b, GL_CULL_FACE);
 }
 
 auto GraphicsHandler::set_depth_testing(bool b) const -> void {
-    GLAD_ENABLE_DISABLE(GL_DEPTH_TEST);
+    glad_enable_disable(b, GL_DEPTH_TEST);
 }
 
 void GraphicsHandler::clear_screen() const {

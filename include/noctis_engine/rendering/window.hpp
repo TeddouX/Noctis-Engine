@@ -25,7 +25,10 @@ public:
     auto lock_cursor() const -> void { glfwSetInputMode(m_glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED); }
     auto unlock_cursor() const -> void { glfwSetInputMode(m_glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL); }
 
+    // In seconds
     auto delta_time() const -> double { return deltaTime_; }
+
+    auto set_title(const std::string &newTitle) const -> void { glfwSetWindowTitle(m_glfwWindow, newTitle.c_str()); }
 
 private:
     GLFWwindow *m_glfwWindow = nullptr;

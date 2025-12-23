@@ -22,8 +22,8 @@ constexpr auto ensure(bool predicate, std::format_string<Args...> msg, Args &&..
 template <class... Args>
 constexpr auto expect(bool predicate, std::format_string<Args...> msg, Args &&...args) -> bool {
     if (!predicate) {
-        Log::Error("Ensure failed: {}", std::format(msg, std::forward<Args>(args)...));
-        Log::Error("Ensure failed: {}", std::stacktrace::current(1));
+        Log::Error("Expect failed: {}", std::format(msg, std::forward<Args>(args)...));
+        Log::Error("Expect failed: {}", std::stacktrace::current(1));
     }
     
     return predicate;

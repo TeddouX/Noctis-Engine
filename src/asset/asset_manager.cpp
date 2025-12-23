@@ -7,12 +7,12 @@ namespace NoctisEngine
 {
 
 template <typename AssetType_>
-std::shared_ptr<AssetType_> load_with_cache(
-    std::unordered_map<std::filesystem::path, std::shared_ptr<AssetType_>>& cache,
-    const std::filesystem::path& path,
-    const std::string& name,
+auto load_with_cache(
+    std::unordered_map<std::filesystem::path, std::shared_ptr<AssetType_>> &cache,
+    const std::filesystem::path &path,
+    const std::string &name,
     std::function<std::shared_ptr<AssetType_> (void)> loader,
-    std::string_view assetKind) {
+    std::string_view assetKind) -> std::shared_ptr<AssetType_> {
 
     const std::string filename = path.filename().string();
 

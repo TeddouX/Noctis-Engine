@@ -108,6 +108,9 @@ int main() {
     texture->set_mag_function(NoctisEngine::Texture::MagnifyingFunction::LINEAR);
     texture->set_wrap_function(NoctisEngine::Texture::WrapParam::REPEAT, NoctisEngine::Texture::WrapParam::REPEAT);
 
+    double timeAccumulator{};
+    int frameCount{};
+
     while (!window.should_close()) {
         if (NoctisEngine::InputSystem::is_key_pressed(NoctisEngine::Key::E))
             NoctisEngine::Log::Info("E pressed");
@@ -124,7 +127,18 @@ int main() {
 
         float dt = static_cast<float>(window.delta_time());
 
-        // NoctisEngine::Log::Debug("FPS: {}", 1/dt);
+        timeAccumulator += dt;
+        frameCount++;
+
+        if (timeAccumulator >= 1.0) {
+            double averageFPS = frameCount / timeAccumulator;
+            double frameTime = 1000.0 / averageFPS;
+
+            window.set_title(std::format("Testing | FPS: {:.3f} | {:.3f} ms", averageFPS, frameTime));
+
+            timeAccumulator = 0.0;
+            frameCount = 0;
+        }
 
         auto forward = cam.forward();
         auto right = cam.right();
