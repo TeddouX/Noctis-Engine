@@ -1,5 +1,5 @@
 #pragma once
-#include <memory>
+#include <optional>
 #include <filesystem>
 
 #include "../rendering/texture.hpp"
@@ -8,6 +8,6 @@
 namespace NoctisEngine::Internal
 {
 
-NCENG_API std::unique_ptr<Texture> load_texture(const std::filesystem::path &path, const std::string &name);
+NCENG_API std::optional<Texture> load_texture(const std::filesystem::path &path, const std::string &name);
 
 } // namespace NoctisEngine::Internal

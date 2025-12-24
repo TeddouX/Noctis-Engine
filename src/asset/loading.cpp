@@ -7,13 +7,13 @@
 namespace NoctisEngine::Internal
 {
     
-NCENG_API std::unique_ptr<Texture> load_texture(const std::filesystem::path &path, const std::string &name) {
+NCENG_API std::optional<Texture> load_texture(const std::filesystem::path &path, const std::string &name) {
     int width, height;
     int nrChannels;
 
     if (!std::filesystem::exists(path)) {
         Log::Error("{} does not exist.", path.string());
-        return nullptr;
+        return std::nullopt;
     }
 
     uint8_t *data = ::stbi_load(
@@ -24,7 +24,7 @@ NCENG_API std::unique_ptr<Texture> load_texture(const std::filesystem::path &pat
 
     if (!data) {
         Log::Error("Failed to load image {}: {}", path.string(), ::stbi_failure_reason());
-        return nullptr;
+        return std::nullopt;
     }
 
     TextureInfo texInfo {
@@ -34,11 +34,11 @@ NCENG_API std::unique_ptr<Texture> load_texture(const std::filesystem::path &pat
         .name = name
     };
 
-    auto tex = std::make_unique<Texture>(texInfo);
+    Texture tex{texInfo};
 
     ::stbi_image_free(data);
 
-    return std::move(tex);
+    return tex;
 }
 
 } // namespace NoctisEngine::Internal

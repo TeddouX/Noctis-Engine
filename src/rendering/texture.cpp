@@ -55,11 +55,10 @@ Texture::Texture(TextureInfo texInfo)
     ::glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-Texture::~Texture() {
-    ::glDeleteTextures(1, &texId_);
-}
+auto Texture::bind(int bindPoint, const Shader *shader) const -> void {
+    if (!shader)
+        return;
 
-auto Texture::bind(int bindPoint, const std::shared_ptr<Shader> &shader) const -> void {
     shader->set_uniform(UniformInfo{
         .type = UniformType::INT,
         .name = name_,

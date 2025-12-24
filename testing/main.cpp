@@ -35,7 +35,7 @@ glm::mat4x4 createModelMatrix(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale) {
 }
 
 int main() {
-    auto manager = std::make_unique<NoctisEngine::AssetManager>();
+    auto assetManager = std::make_unique<NoctisEngine::AssetManager>();
 
     NoctisEngine::Window window = NoctisEngine::create_context(800, 600, "Testing");
     
@@ -45,9 +45,10 @@ int main() {
     handler->set_backface_culling(false);
     handler->set_depth_testing(true);
 
-    auto shader = manager->load_asset<NoctisEngine::Shader>("./testing/test_shader.glsl");
+    auto shaderHandle = assetManager->load_asset<NoctisEngine::Shader>("./testing/test_shader.glsl");
+    auto shader = assetManager->try_get(shaderHandle);
 
-    if (!shader->compile())
+    if (!shader || !shader->compile())
         return EXIT_FAILURE;
 
     NoctisEngine::VertexArrayInfo plane {
@@ -95,7 +96,6 @@ int main() {
     testUB.upload_data(sizeof(glm::vec3), &col);
 
     NoctisEngine::Camera cam(glm::vec3(-5, 1, 2), 800/600, 70.f, .1f, 1000.f);
-    // cam.rotate_by(-5.f, -10.f);
 
     auto modelSSBO = NoctisEngine::SSBO(2);
     glm::mat4x4 modelMatrix = createModelMatrix(glm::vec3(0, 1, 0), glm::vec3(0, 90, 0), glm::vec3(1));
@@ -103,18 +103,20 @@ int main() {
 
     window.lock_cursor();
 
-    auto texture = manager->load_asset<NoctisEngine::Texture>("./testing/drone.png");
-    texture->set_min_function(NoctisEngine::Texture::MinifyingFunction::LINEAR);
-    texture->set_mag_function(NoctisEngine::Texture::MagnifyingFunction::LINEAR);
+    auto textureHandle = assetManager->load_asset<NoctisEngine::Texture>("./testing/drone.png");
+    auto texture = assetManager->try_get(textureHandle);
+
+    if (!texture)
+        return EXIT_FAILURE;
+
+    texture->set_min_function(NoctisEngine::Texture::MinifyingFunction::NEAREST);
+    texture->set_mag_function(NoctisEngine::Texture::MagnifyingFunction::NEAREST);
     texture->set_wrap_function(NoctisEngine::Texture::WrapParam::REPEAT, NoctisEngine::Texture::WrapParam::REPEAT);
 
     double timeAccumulator{};
     int frameCount{};
 
     while (!window.should_close()) {
-        if (NoctisEngine::InputSystem::is_key_pressed(NoctisEngine::Key::E))
-            NoctisEngine::Log::Info("E pressed");
-
         if (NoctisEngine::InputSystem::is_key_pressed(NoctisEngine::Key::ESCAPE)) {
             NoctisEngine::Log::Info("Esc pressed");
             break;

@@ -3,6 +3,7 @@ project(NoctisEngine VERSION 0.0.1)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
+add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/entt)
 add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/glad)
 add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/glfw)
 add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/glm)

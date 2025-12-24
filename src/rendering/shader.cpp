@@ -20,9 +20,6 @@ Shader::Shader(const std::string &code, const std::string &name) {
     const std::string vertCodeStr = header + "VERTEX\n" + code;
     const std::string fragCodeStr = header + "FRAGMENT\n" + code;
 
-    // Log::Debug("{}", vertCodeStr);
-    // Log::Debug("{}", fragCodeStr);
-
     const char* vertCode = vertCodeStr.c_str();
     const char* fragCode = fragCodeStr.c_str();
     

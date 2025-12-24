@@ -29,7 +29,7 @@ public:
 
     enum class MagnifyingFunction : uint32_t {
         NEAREST = 0x2600,
-        LINEAR = 0x2600,
+        LINEAR = 0x2601,
     };
 
     enum class WrapParam : uint32_t {
@@ -41,10 +41,9 @@ public:
     };
 
     Texture(TextureInfo texInfo);
-    ~Texture();
 
     // The shader must be bound before calling this function!!
-    auto bind(int bindPoint, const std::shared_ptr<Shader> &shader) const -> void;
+    auto bind(int bindPoint, const Shader *shader) const -> void;
 
     auto set_min_function(MinifyingFunction param) const -> void;
     auto set_mag_function(MagnifyingFunction param) const -> void;
