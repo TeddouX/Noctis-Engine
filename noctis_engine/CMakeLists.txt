@@ -43,7 +43,7 @@ set(NOCTIS_ENGINE_SOURCES
     "src/rendering/window.cpp"
 )
 
-add_library(NoctisEngine ${NOCTIS_ENGINE_SOURCES})
+add_library(NoctisEngine STATIC ${NOCTIS_ENGINE_SOURCES})
 
 target_link_libraries(NoctisEngine
     glm::glm
