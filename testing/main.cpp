@@ -38,7 +38,7 @@ int main() {
     auto assetManager = std::make_unique<NoctisEngine::AssetManager>();
 
     NoctisEngine::Window window = NoctisEngine::create_context(800, 600, "Testing");
-    
+
     auto handler = NoctisEngine::RenderState::init();
     NoctisEngine::RenderState::set_clear_screen_color(NoctisEngine::Color{9, 9, 9, 255});
 
@@ -123,7 +123,7 @@ int main() {
         }
 
         handler->clear_screen();
-        
+
         NoctisEngine::MouseMouvement mouseMvt = NoctisEngine::InputSystem::get_mouse_mouvement();
         cam.rotate_by_clamped(mouseMvt.xDelta * MOUSE_SENS, -mouseMvt.yDelta * MOUSE_SENS);
 

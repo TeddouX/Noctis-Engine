@@ -26,7 +26,7 @@ GraphicsHandler::GraphicsHandler() {
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
-    glDebugMessageCallback(OpenGLDbgMessCallback, nullptr);
+    glDebugMessageCallback((GLDEBUGPROC)OpenGLDbgMessCallback, nullptr);
 }
 
 auto GraphicsHandler::set_backface_culling(bool b) const -> void {
