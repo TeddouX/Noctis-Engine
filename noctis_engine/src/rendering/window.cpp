@@ -2,7 +2,6 @@
 
 #include <print>
 
-#include <rendering/render_state.hpp>
 #include <input/input_system.hpp>
 #include <core/logging.hpp>
 
@@ -51,14 +50,6 @@ auto Window::poll_events() -> void {
 
 void Window::GLFWErrorCallback(int code, const char *desc) {
     Log::Error("GLFW error: {}", desc);
-}
-
-NCENG_API Window create_context(int windowWidth, int windowHeight, const std::string &title) {
-    Window window{windowWidth, windowHeight, title};
-    
-    RenderState::context_created();
-
-    return window;
 }
 
 } // namespace NoctisEngine

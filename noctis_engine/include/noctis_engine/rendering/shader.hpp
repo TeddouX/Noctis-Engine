@@ -20,7 +20,7 @@ public:
     Shader(const std::string &code, const std::string &name);
     ~Shader() = default;
 
-    auto compile() -> bool;
+    auto compile() -> void;
     auto bind() -> void;
     auto set_uniform(const UniformInfo &info) const -> bool;
 

@@ -1,11 +1,11 @@
 #include <rendering/graphics_handler.hpp>
 
 #include <print>
+#include <stacktrace>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <rendering/render_state.hpp>
 #include <core/logging.hpp>
 
 namespace NoctisEngine
@@ -26,7 +26,7 @@ GraphicsHandler::GraphicsHandler() {
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
-    glDebugMessageCallback((GLDEBUGPROC)OpenGLDbgMessCallback, nullptr);
+    glDebugMessageCallback((GLDEBUGPROC)OpenGLDbgMessCallback, this);
 }
 
 auto GraphicsHandler::set_backface_culling(bool b) const -> void {
@@ -37,14 +37,20 @@ auto GraphicsHandler::set_depth_testing(bool b) const -> void {
     glad_enable_disable(b, GL_DEPTH_TEST);
 }
 
-void GraphicsHandler::clear_screen() const {
-    const Color &color = RenderState::clear_screen_color();
+auto GraphicsHandler::set_clear_screen_color(Color col) -> void {
+    clearScrCol_ = col;
+}
 
+auto GraphicsHandler::set_throw_on_err(bool b) -> void {
+    throwOnErr_ = b;
+}
+
+void GraphicsHandler::clear_screen() const {
     glClearColor(
-        color.red_f(), 
-        color.green_f(), 
-        color.blue_f(), 
-        color.alpha_f()
+        clearScrCol_.red_f(), 
+        clearScrCol_.green_f(), 
+        clearScrCol_.blue_f(), 
+        clearScrCol_.alpha_f()
     );
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -57,8 +63,17 @@ void GraphicsHandler::OpenGLDbgMessCallback(uint32_t source, uint32_t type, uint
         Log::Info("OpenGL: {}", message);
     else if (severity == GL_DEBUG_SEVERITY_MEDIUM)
         Log::Warn("OpenGL: {}", message);
-    else if (severity == GL_DEBUG_SEVERITY_HIGH)
-        Log::Error("OpenGL: {}", message);
+    else if (severity == GL_DEBUG_SEVERITY_HIGH) {
+        auto gh = static_cast<const GraphicsHandler *>(userParam);
+
+        if (gh->throwOnErr_) {
+            Log::Error("OpenGL Error: {}", message);
+            Log::Error("StackTrace: \n{}", std::stacktrace::current());
+            throw std::runtime_error("An OpenGL error has been generated and throw on error has been enabled, for more info see above.");
+        }
+        else
+            Log::Error("OpenGL: {}", message);
+    }
 }
 
 } // namespace NoctisEngine

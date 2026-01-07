@@ -125,7 +125,13 @@ auto InputSystem::GLFWMouseButtonCallback(GLFWwindow *window, int button, int ac
 
 auto InputSystem::check_key(Key key) -> bool {
     size_t keyOrd = ordinal(key);
-    return expect(keyOrd < keyStates_.size(), "Invalid key: {}", keyOrd);
+    
+    if (keyOrd >= keyStates_.size()) {
+        Log::Error("Invalid key: {}", keyOrd);
+        return false;
+    }
+
+    return true;
 }
 
 auto InputSystem::update_state(InputState &state) -> void {

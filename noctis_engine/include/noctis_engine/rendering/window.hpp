@@ -39,6 +39,4 @@ private:
     static void GLFWErrorCallback(int code, const char *desc);
 };
 
-NCENG_API Window create_context(int windowWidth, int windowHeight, const std::string &title);
-
 } // namespace NoctisEngine

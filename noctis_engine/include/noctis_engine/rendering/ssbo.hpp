@@ -8,6 +8,7 @@ namespace NoctisEngine
     
 class NCENG_API SSBO {
 public:
+    SSBO() = default;
     SSBO(int bindPoint);
     ~SSBO() = default;
 

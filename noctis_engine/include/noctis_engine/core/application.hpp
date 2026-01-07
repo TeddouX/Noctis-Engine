@@ -8,10 +8,10 @@ public:
     Application() = default;
     virtual ~Application() = default;
 
-    virtual void run() {};
+    virtual auto run() -> void {};
     // virtual void shutdown() {};
 };
 
-Application* create_application();
+auto create_application(int argc, char **argv) -> Application *;
 
 } // namespace NoctisEngine

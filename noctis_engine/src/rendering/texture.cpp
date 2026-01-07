@@ -11,10 +11,6 @@ Texture::Texture(TextureInfo texInfo)
     : name_(texInfo.name)
 {
     ::glGenTextures(1, &texId_);
-
-    if (!expect(texId_ >= 0, "Texture failed to generate"))
-        return;
-
     ::glBindTexture(GL_TEXTURE_2D, texId_);
     ::glObjectLabel(GL_TEXTURE, texId_, -1, name_.c_str());
 

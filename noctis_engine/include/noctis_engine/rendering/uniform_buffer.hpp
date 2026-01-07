@@ -8,6 +8,7 @@ namespace NoctisEngine
     
 class NCENG_API UniformBuffer {
 public:
+    UniformBuffer() = default;
     UniformBuffer(int bindPoint);
     ~UniformBuffer() = default;
 
@@ -16,7 +17,7 @@ public:
     void update_data(size_t offset, size_t size, void *data);
 
 private:
-    uint32_t ID_;
+    uint32_t ID_{};
     size_t size_ = 0;
     int bindPoint_;
 };

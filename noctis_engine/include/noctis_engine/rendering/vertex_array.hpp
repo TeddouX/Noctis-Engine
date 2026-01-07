@@ -14,13 +14,15 @@ struct VertexArrayInfo {
 
 class NCENG_API VertexArray {
 public:
+    VertexArray() = default;
     VertexArray(const VertexArrayInfo &info);
+    
     ~VertexArray() = default;
 
     void use();
 
 private:
-    uint32_t VAO_;
+    uint32_t VAO_{};
     
     bool isIndexed_;
     int indicesSize_;

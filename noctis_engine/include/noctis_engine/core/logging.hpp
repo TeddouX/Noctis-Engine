@@ -4,6 +4,7 @@
 #include <source_location>
 #include <string_view>
 #include <chrono>
+#include <filesystem>
 
 namespace NoctisEngine
 {
@@ -26,10 +27,12 @@ public:
         std::string formattedMsg = std::format(msg, std::forward<Args>(args)...);
 
         constexpr std::string_view formatStr = "[{} {}] in {}({}:{}): {}";
+        const std::filesystem::path filePath(loc.file_name());
+
         std::println(formatStr, 
             debugLvlStr,
             timeStr,
-            loc.file_name(), loc.line(), loc.column(),
+            filePath.filename().string(), loc.line(), loc.column(),
             formattedMsg
         );
     }

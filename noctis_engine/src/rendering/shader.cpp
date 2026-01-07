@@ -30,7 +30,7 @@ Shader::Shader(const std::string &code, const std::string &name) {
     glObjectLabel(GL_PROGRAM, programID_, -1, name.c_str());
 }
 
-auto Shader::compile() -> bool {
+auto Shader::compile() -> void {
     int success;
     char infolog[1024];
 
@@ -57,16 +57,12 @@ auto Shader::compile() -> bool {
 
     if (!success) {
         glGetProgramInfoLog(programID_, sizeof(infolog), nullptr, infolog);
-        Log::Error("Program linking failed: {}", infolog);
-
-        return false;
+        throw std::runtime_error("Program linking failed, see errors above.");
     }
 
     // Cleanup
     glDeleteShader(vertShader_);
     glDeleteShader(fragShader_);
-
-    return true;
 }
 
 void Shader::bind() {
