@@ -15,9 +15,6 @@
 #   define NCENG_API
 #endif
 
-#undef NCENG_API
-#define NCENG_API
-
 namespace NoctisEngine
 {
 

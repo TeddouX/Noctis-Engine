@@ -9,7 +9,7 @@ struct Vertex {
     glm::vec3 normal;
     glm::vec2 texCoords;
 
-    Vertex(glm::vec3 pos, glm::vec3 normal, glm::vec2 texCoords)
+    constexpr Vertex(glm::vec3 pos, glm::vec3 normal, glm::vec2 texCoords)
         : pos(pos), normal(normal), texCoords(texCoords) {}
 };
 

@@ -1,8 +1,6 @@
 #include <noctis_engine/rendering/shader.hpp>
 #include <noctis_engine/rendering/vertex_array.hpp>
-#include <noctis_engine/rendering/uniform_buffer.hpp>
 #include <noctis_engine/rendering/camera.hpp>
-#include <noctis_engine/rendering/ssbo.hpp>
 #include <noctis_engine/rendering/window.hpp>
 #include <noctis_engine/rendering/graphics_handler.hpp>
 #include <noctis_engine/input/input_system.hpp>
@@ -45,9 +43,11 @@ TestApp::TestApp()
         texture->set_wrap_function(NoctisEngine::Texture::WrapParam::REPEAT, NoctisEngine::Texture::WrapParam::REPEAT);
     }
 
-    modelSSBO_ = NoctisEngine::SSBO(2);
+    modelSSBO_ = NoctisEngine::GPUBuffer(sizeof(glm::mat4), "model_SSBO");
+    modelSSBO_.bind_buffer_base(NoctisEngine::BufferType::SHADER_STORAGE_BUFFER, 2);
+
     modelMatrix_ = create_model_matrix(glm::vec3(0, 1, 0), glm::vec3(0, 90, 0), glm::vec3(1));
-    modelSSBO_.upload_data(sizeof(glm::mat4x4), &modelMatrix_);
+    modelSSBO_.write(NoctisEngine::get_cpu_buffer_view(modelMatrix_), 0, NoctisEngine::WriteType::DYNAMIC_DRAW);
 
     vertArray_ = NoctisEngine::VertexArray(PLANE);
 }
@@ -59,7 +59,7 @@ auto TestApp::run() -> void {
     auto texture = assetManager_->try_get(texHandle_);
 
     if(shader == nullptr || texture == nullptr) 
-        throw std::runtime_error("Getting the texture and shader failed.");
+        throw NoctisEngine::Exception("Getting the texture and shader failed.");
 
     while (!window_.should_close()) {
         if (NoctisEngine::InputSystem::is_key_pressed(NoctisEngine::Key::ESCAPE)) {
@@ -101,7 +101,7 @@ auto TestApp::run() -> void {
         double time = window_.get_time();
 
         modelMatrix_ = create_model_matrix(glm::vec3(0, sin(time + 0.0f) * 0.5f, 0), glm::vec3(0, time * 8, 0), glm::vec3(1));
-        modelSSBO_.update_data(0, sizeof(glm::mat4x4), &modelMatrix_);
+        modelSSBO_.write(NoctisEngine::get_cpu_buffer_view(modelMatrix_), 0, NoctisEngine::WriteType::DYNAMIC_DRAW);
 
         camera_.upload_data();
 

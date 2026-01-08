@@ -2,7 +2,6 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <rendering/uniform_buffer.hpp>
 #include <core/logging.hpp>
 
 namespace NoctisEngine
@@ -22,21 +21,20 @@ Camera::Camera(glm::vec3 pos,
     float aspectRatio, 
     float fov, 
     float near, float far) 
-    : pos_(pos), 
-    aspectRatio_(aspectRatio), 
-    fov_(fov), 
-    near_(near), 
-    far_(far),
-    yaw_(0.0f), 
-    pitch_(0.0f),
-    up_(WORLD_UP),
-    forward_(glm::vec3{0}),
-    right_(glm::normalize(glm::cross(forward_, up_))),
-    uniformBuffer_(UniformBuffer{0})
+    : pos_(pos)
+    , aspectRatio_(aspectRatio)
+    , fov_(fov)
+    , near_(near)
+    , far_(far)
+    , yaw_(0.0f)
+    , pitch_(0.0f)
+    , up_(WORLD_UP)
+    , forward_(glm::vec3{0})
+    , right_(glm::normalize(glm::cross(forward_, up_)))
+    , uniformBuffer_(sizeof(Camera::Data), "camera_UBO")
+    , data_{ .projMat = glm::perspective(glm::radians(fov_), aspectRatio_, near_, far_) }
 {
-    uniformBuffer_.upload_data(sizeof(Camera::Data), &data_);
-
-    data_.projMat = glm::perspective(glm::radians(fov_), aspectRatio_, near_, far_);
+    uniformBuffer_.bind_buffer_base(BufferType::UNIFORM_BUFFER, 0);
 }
 
 void Camera::rotate_by_clamped(float yaw, float pitch) {
@@ -70,7 +68,7 @@ auto Camera::translate_by(glm::vec3 translation) -> void {
 }
 
 void Camera::upload_data() {
-    uniformBuffer_.update_data(0, sizeof(Camera::Data), &data_);
+    uniformBuffer_.write(get_cpu_buffer_view(data_), 0, WriteType::DYNAMIC_DRAW);
 }
 
 auto Camera::update_view_mat() -> void {

@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #include <core/logging.hpp>
+#include <core/exception.hpp>
 
 namespace NoctisEngine
 {
@@ -68,8 +69,7 @@ void GraphicsHandler::OpenGLDbgMessCallback(uint32_t source, uint32_t type, uint
 
         if (gh->throwOnErr_) {
             Log::Error("OpenGL Error: {}", message);
-            Log::Error("StackTrace: \n{}", std::stacktrace::current());
-            throw std::runtime_error("An OpenGL error has been generated and throw on error has been enabled, for more info see above.");
+            throw Exception("An OpenGL error has been generated and throw on error is enabled, for more info see above.");
         }
         else
             Log::Error("OpenGL: {}", message);

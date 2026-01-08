@@ -5,6 +5,7 @@
 #include <print>
 
 #include <core/logging.hpp>
+#include <core/exception.hpp>
 
 namespace NoctisEngine
 {
@@ -57,7 +58,7 @@ auto Shader::compile() -> void {
 
     if (!success) {
         glGetProgramInfoLog(programID_, sizeof(infolog), nullptr, infolog);
-        throw std::runtime_error("Program linking failed, see errors above.");
+        throw Exception("Program linking failed, see errors above.");
     }
 
     // Cleanup

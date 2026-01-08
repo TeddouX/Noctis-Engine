@@ -4,10 +4,9 @@
 #include <noctis_engine/rendering/window.hpp>
 #include <noctis_engine/rendering/graphics_handler.hpp>
 #include <noctis_engine/rendering/vertex_array.hpp>
-#include <noctis_engine/rendering/uniform_buffer.hpp>
 #include <noctis_engine/rendering/texture.hpp>
 #include <noctis_engine/rendering/camera.hpp>
-#include <noctis_engine/rendering/ssbo.hpp>
+#include <noctis_engine/rendering/gpu_buffer.hpp>
 
 
 constexpr float MOUSE_SENS = 1.0f/10.0f;
@@ -15,18 +14,19 @@ constexpr float CAM_SPEED = 2.5f;
 
 
 const NoctisEngine::VertexArrayInfo PLANE {
-    .vertices = {
+    "plane",
+    {
         NoctisEngine::Vertex(glm::vec3( 0.5f,  0.5f, 0.0f), glm::vec3(0), glm::vec2(1, 1)),
         NoctisEngine::Vertex(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec3(0), glm::vec2(1, 0)),
-        NoctisEngine::Vertex(glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0), glm::vec3(0)),
+        NoctisEngine::Vertex(glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0), glm::vec2(0)),
         NoctisEngine::Vertex(glm::vec3( 0.5f, -0.5f, 0.0f), glm::vec3(0), glm::vec2(0, 1)),
     },
-    .indices = {0, 1, 2, 2, 3, 0}
+    {0, 1, 2, 2, 3, 0}
 };
 
 const NoctisEngine::VertexArrayInfo CUBE {
-    .vertices = {
-        // Front face
+    "cube",
+    {
         NoctisEngine::Vertex(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(0), glm::vec2(0)),
         NoctisEngine::Vertex(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec3(0), glm::vec2(0)),
         NoctisEngine::Vertex(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3(0), glm::vec2(0)),
@@ -36,7 +36,7 @@ const NoctisEngine::VertexArrayInfo CUBE {
         NoctisEngine::Vertex(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3(0), glm::vec2(0)),
         NoctisEngine::Vertex(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(0), glm::vec2(0)),
     },
-    .indices = {
+    {
         // Front
         0, 1, 2,  2, 3, 0,
         // Right
@@ -71,11 +71,11 @@ private:
     NoctisEngine::TextureHandle texHandle_;
     NoctisEngine::ShaderHandle  shaderHandle_;
 
-    NoctisEngine::VertexArray   vertArray_;
-    NoctisEngine::UniformBuffer testUB_;
-    NoctisEngine::SSBO          modelSSBO_;
-    glm::mat4x4                 modelMatrix_;
-    NoctisEngine::Camera        camera_;
+    NoctisEngine::VertexArray vertArray_;
+    NoctisEngine::GPUBuffer   testUB_;
+    NoctisEngine::GPUBuffer   modelSSBO_;
+    glm::mat4x4               modelMatrix_;
+    NoctisEngine::Camera      camera_;
 
     double timeAcc_{};
     int frameCount_{};

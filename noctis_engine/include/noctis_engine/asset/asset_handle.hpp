@@ -1,6 +1,7 @@
 #pragma once
 #include "../rendering/shader.hpp"
 #include "../rendering/texture.hpp"
+#include "../core/exception.hpp"
 
 namespace NoctisEngine
 {
@@ -24,7 +25,7 @@ auto AssetHandle<AssetType_>::is_valid() -> bool {
 template <typename AssetType_>
 auto AssetHandle<AssetType_>::expect_valid(const std::string &mess) -> void {
     if (!is_valid())
-        throw std::runtime_error(mess);
+        throw Exception("AssetHandle::expect_valid failed: {}", mess);
 }
 
 } // namespace NoctisEngine

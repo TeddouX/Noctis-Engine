@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "../noctis_engine.hpp"
-#include "uniform_buffer.hpp"
+#include "gpu_buffer.hpp"
 
 namespace NoctisEngine
 {
@@ -33,7 +33,7 @@ public:
     auto pitch() -> float { return pitch_; }
 
 private:
-    UniformBuffer uniformBuffer_;
+    GPUBuffer uniformBuffer_;
     glm::vec3 pos_;
     glm::vec3 up_;
     glm::vec3 right_;

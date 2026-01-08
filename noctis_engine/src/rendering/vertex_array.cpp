@@ -2,6 +2,8 @@
 
 #include <glad/glad.h>
 
+#include <noctis_engine/rendering/gpu_buffer.hpp>
+
 namespace NoctisEngine
 {
     
@@ -20,15 +22,23 @@ VertexArray::VertexArray(const VertexArrayInfo &info) {
 
     verticesSize_ = static_cast<int>(info.vertices.size());
     
-    uint32_t VBO;
-    create_buffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, info.vertices, VBO);
+    GPUBuffer vertexBuffer(info.vertices.size() * sizeof(Vertex), info.name);
+    vertexBuffer.bind_as(BufferType::ARRAY_BUFFER);
+    vertexBuffer.write(
+        get_cpu_buffer_view(info.vertices, 0, info.vertices.size()), 0, 
+        WriteType::DYNAMIC_DRAW
+    );
 
     if (!info.indices.empty()) {
         indicesSize_ = static_cast<int>(info.indices.size());
         isIndexed_ = true;
 
-        uint32_t EBO;
-        create_buffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, info.indices, EBO);
+        GPUBuffer vertexBuffer(info.indices.size() * sizeof(uint32_t), info.name);
+        vertexBuffer.bind_as(BufferType::ELEMENT_ARRAY_BUFFER);
+        vertexBuffer.write(
+            get_cpu_buffer_view(info.indices, 0, info.indices.size()), 0, 
+            WriteType::DYNAMIC_DRAW
+        );
     } 
     else
         isIndexed_ = false;
@@ -39,6 +49,8 @@ VertexArray::VertexArray(const VertexArrayInfo &info) {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
     glEnableVertexAttribArray(2);	
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+
+    glBindVertexArray(0);
 }
 
 void VertexArray::use() {
@@ -48,6 +60,8 @@ void VertexArray::use() {
         glDrawElements(GL_TRIANGLES, indicesSize_, GL_UNSIGNED_INT, 0);
     else
         glDrawArrays(GL_TRIANGLES, 0, verticesSize_);
+
+    glBindVertexArray(0);
 }
 
 } // namespace NoctisEngine

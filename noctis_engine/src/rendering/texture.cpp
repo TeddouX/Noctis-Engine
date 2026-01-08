@@ -10,15 +10,14 @@ namespace NoctisEngine
 Texture::Texture(TextureInfo texInfo)
     : name_(texInfo.name)
 {
-    ::glGenTextures(1, &texId_);
-    ::glBindTexture(GL_TEXTURE_2D, texId_);
-    ::glObjectLabel(GL_TEXTURE, texId_, -1, name_.c_str());
+    glGenTextures(1, &texId_);
+    glBindTexture(GL_TEXTURE_2D, texId_);
+    glObjectLabel(GL_TEXTURE, texId_, -1, name_.c_str());
 
-    // TODO: make this controllable
-    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     GLenum internalFormat = GL_RGBA8;
     GLenum dataFormat = GL_RGBA;
@@ -34,7 +33,7 @@ Texture::Texture(TextureInfo texInfo)
         dataFormat = GL_RGB;
     }
 
-	::glTexImage2D(
+	glTexImage2D(
 		GL_TEXTURE_2D, 
 		0, 
 		internalFormat, 
@@ -46,9 +45,9 @@ Texture::Texture(TextureInfo texInfo)
 		texInfo.data
 	);
 
-	::glGenerateMipmap(GL_TEXTURE_2D);
+	glGenerateMipmap(GL_TEXTURE_2D);
 
-    ::glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 auto Texture::bind(int bindPoint, const Shader *shader) const -> void {
@@ -61,27 +60,27 @@ auto Texture::bind(int bindPoint, const Shader *shader) const -> void {
         .val = bindPoint,
     });
 
-    ::glActiveTexture(GL_TEXTURE0 + bindPoint);
-    ::glBindTexture(GL_TEXTURE_2D, texId_);
+    glActiveTexture(GL_TEXTURE0 + bindPoint);
+    glBindTexture(GL_TEXTURE_2D, texId_);
 }
 
 auto Texture::set_min_function(MinifyingFunction param) const -> void {
-    ::glBindTexture(GL_TEXTURE_2D, texId_);
-    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, static_cast<GLint>(param));
-    ::glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D, texId_);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, static_cast<GLint>(param));
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 auto Texture::set_mag_function(MagnifyingFunction param) const -> void {
-    ::glBindTexture(GL_TEXTURE_2D, texId_);
-    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, static_cast<GLint>(param));
-    ::glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D, texId_);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, static_cast<GLint>(param));
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 auto Texture::set_wrap_function(WrapParam paramU, WrapParam paramV) const -> void {
-    ::glBindTexture(GL_TEXTURE_2D, texId_);
-    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, static_cast<GLint>(paramU));
-    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, static_cast<GLint>(paramV));
-    ::glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D, texId_);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, static_cast<GLint>(paramU));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, static_cast<GLint>(paramV));
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 } // namespace NoctisEngine
