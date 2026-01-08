@@ -1,6 +1,7 @@
 #pragma once
 #include <format>
 #include <stacktrace>
+#include <utility>
 
 #include "logging.hpp"
 

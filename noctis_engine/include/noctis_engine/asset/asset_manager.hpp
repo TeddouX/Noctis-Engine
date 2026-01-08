@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 
 #include "../core/assert.hpp"
 #include "../rendering/texture.hpp"

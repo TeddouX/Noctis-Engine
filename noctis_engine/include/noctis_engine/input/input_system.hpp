@@ -34,7 +34,7 @@ private:
             HELD,
             RELEASED 
         } state;
-        Modifier mods = Modifier::NONE;
+        Modifier mods;
     };
 
     inline static std::array<InputState, NUM_KEYS> keyStates_;

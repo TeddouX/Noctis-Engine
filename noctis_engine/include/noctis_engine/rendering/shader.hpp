@@ -1,6 +1,7 @@
 #pragma once
 #include <variant>
 #include <string>
+#include <cstdint>
 
 #include "../noctis_engine.hpp"
 
