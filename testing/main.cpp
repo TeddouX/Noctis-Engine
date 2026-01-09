@@ -21,6 +21,7 @@ TestApp::TestApp()
     : window_(800, 600, "Testing")
     , assetManager_(std::make_unique<NoctisEngine::AssetManager>())
     , meshManager_(std::make_shared<NoctisEngine::MeshManager>())
+    , materialManager_(std::make_unique<NoctisEngine::MaterialManager>())
     , camera_(glm::vec3(-5, 1, 2), 800/600, 70.f, .1f, 1000.f)
     , scene_(meshManager_)
 {
@@ -29,23 +30,25 @@ TestApp::TestApp()
     graphicsHandler_.set_depth_testing(true);
     graphicsHandler_.set_throw_on_err(true);
 
-    {
-        shaderHandle_ = assetManager_->load_asset<NoctisEngine::Shader>("./testing/test_shader.glsl");
-        shaderHandle_.expect_valid("Failed to load shader.");
+    shaderHandle_ = assetManager_->load_asset<NoctisEngine::Shader>("./testing/test_shader.glsl");
+    shaderHandle_.expect_valid("Failed to load shader.");
         
-        texHandle_ = assetManager_->load_asset<NoctisEngine::Texture>("./testing/drone.png");
-        texHandle_.expect_valid("Failed to load texture.");
+    texHandle_ = assetManager_->load_asset<NoctisEngine::Texture>("./testing/drone.png");
+    texHandle_.expect_valid("Failed to load texture.");
 
-        auto shader = assetManager_->try_get(shaderHandle_);
-        shader->compile();
+    auto shader = assetManager_->try_get(shaderHandle_);
+    shader->compile();
 
-        auto texture = assetManager_->try_get(texHandle_);
-        texture->set_min_function(NoctisEngine::Texture::MinifyingFunction::NEAREST);
-        texture->set_mag_function(NoctisEngine::Texture::MagnifyingFunction::NEAREST);
-        texture->set_wrap_function(NoctisEngine::Texture::WrapParam::REPEAT, NoctisEngine::Texture::WrapParam::REPEAT);
-    }
+    auto texture = assetManager_->try_get(texHandle_);
+    texture->set_min_function(NoctisEngine::Texture::MinifyingFunction::NEAREST);
+    texture->set_mag_function(NoctisEngine::Texture::MagnifyingFunction::NEAREST);
+    texture->set_wrap_function(NoctisEngine::Texture::WrapParam::REPEAT, NoctisEngine::Texture::WrapParam::REPEAT);
     
     auto meshView = meshManager_->upload(CUBE);
+    NoctisEngine::MaterialData materialData{
+        NoctisEngine::BindlessTexture{*texture}
+    };
+    
     for (int i = 0; i < 3; i++) {
         auto entity = scene_.create_entity();
         entity.add_component(meshView);

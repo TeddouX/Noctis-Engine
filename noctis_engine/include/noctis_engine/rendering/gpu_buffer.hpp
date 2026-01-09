@@ -41,7 +41,7 @@ enum class BufferFlag : std::uint32_t {
 
 NCENG_API auto to_string(BufferType type) -> std::string;
 
-using CPUBufferView = const std::span<const std::byte>;
+using CPUBufferView = const std::span<std::byte>;
 
 class NCENG_API GPUBuffer {
 public:
@@ -62,6 +62,8 @@ public:
     auto map(bool readable) -> void;
     auto unmap() -> void;
     auto mapped_write(CPUBufferView data, size_t offset) -> void;
+
+    auto get_data(std::size_t offset, CPUBufferView &data) const -> void;
 
 private:
     uint32_t id_{};

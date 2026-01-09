@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #include "../noctis_engine.hpp"
+#include "math.hpp"
 
 namespace NoctisEngine
 {
@@ -14,15 +15,19 @@ public:
 
     static const Color BLACK;
 
-    constexpr uint8_t red() const { return m_r; }
-    constexpr uint8_t green() const { return m_g; }
-    constexpr uint8_t blue() const { return m_b; }
-    constexpr uint8_t alpha() const { return m_a; }
+    constexpr auto red() const -> uint8_t { return m_r; }
+    constexpr auto green() const -> uint8_t { return m_g; }
+    constexpr auto blue() const -> uint8_t { return m_b; }
+    constexpr auto alpha() const -> uint8_t { return m_a; }
 
-    constexpr float red_f() const { return m_r / 255; }
-    constexpr float green_f() const { return m_g / 255; }
-    constexpr float blue_f() const { return m_b / 255; }
-    constexpr float alpha_f() const { return m_a / 255; }
+    constexpr auto red_f() const -> float { return m_r / 255; }
+    constexpr auto green_f() const -> float { return m_g / 255; }
+    constexpr auto blue_f() const -> float { return m_b / 255; }
+    constexpr auto alpha_f() const -> float { return m_a / 255; }
+
+    constexpr auto to_vec4() const -> glm::vec4 { 
+        return glm::vec4{red_f(), green_f(), blue_f(), alpha_f()};
+    }
 
 private:
     uint8_t m_r{}, m_g{}, m_b{}, m_a{};

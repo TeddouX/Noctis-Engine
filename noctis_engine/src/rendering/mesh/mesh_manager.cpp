@@ -1,4 +1,4 @@
-#include <rendering/mesh_manager.hpp>
+#include <rendering/mesh/mesh_manager.hpp>
 
 #include <glad/gl.h>
 

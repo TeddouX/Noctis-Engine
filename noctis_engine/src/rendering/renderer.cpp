@@ -1,9 +1,10 @@
 #include <rendering/renderer.hpp>
 
-#include <rendering/mesh_view.hpp>
+#include <rendering/mesh/mesh_view.hpp>
 #include <ecs/component/transform.hpp>
 
 #include <glad/gl.h>
+
 
 namespace NoctisEngine
 {
@@ -21,6 +22,7 @@ struct Object {
     std::uint32_t materialIdx;
 };
 
+
 Renderer::Renderer(std::shared_ptr<MeshManager> meshManager)
     : meshManager_(meshManager)
 {
@@ -29,12 +31,12 @@ Renderer::Renderer(std::shared_ptr<MeshManager> meshManager)
 }
 
 auto Renderer::render(entt::registry &reg) -> void {
-    auto view = reg.view<const Transform, const MeshView>();
+    auto view = reg.view<const Transform, const MeshView, const MaterialKey>();
 
     std::vector<DrawElementsIndirectCommand> commands;
     std::vector<Object> objects;
 
-    for (const auto &[entity, transform, meshView] : view.each()) {
+    for (const auto &[entity, transform, meshView, matKey] : view.each()) {
         commands.push_back(DrawElementsIndirectCommand{
             .count         = static_cast<GLuint>(meshView.indicesCount),
             .instanceCount = 1u,
@@ -45,7 +47,7 @@ auto Renderer::render(entt::registry &reg) -> void {
 
         objects.push_back(Object{
             .modelMat = transform.model_matrix(),
-            .materialIdx = 0,
+            .materialIdx = static_cast<std::uint32_t>(matKey),
         });
     }
 

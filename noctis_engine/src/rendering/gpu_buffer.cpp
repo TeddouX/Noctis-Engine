@@ -107,6 +107,22 @@ auto GPUBuffer::mapped_write(CPUBufferView data, size_t offset) -> void {
     std::memcpy(map_ + offset, data.data(), data.size_bytes());
 }
 
+auto GPUBuffer::get_data(std::size_t offset, CPUBufferView &data) const -> void {
+    if (offset + data.size_bytes() > size_)
+        throw Exception(
+            "Failed to read data at offset {} with an object size of {} bytes because it exceeds the buffer's size ({} bytes)" ,
+            offset, data.size_bytes(), size_
+        );
+
+    glGetNamedBufferSubData(
+        id_, 
+        offset, 
+        data.size_bytes(), 
+        // sorry
+        const_cast<std::span<std::byte> &>(data).data()
+    );
+}
+
 
 NCENG_API auto to_string(BufferType type) -> std::string {
     switch (type) {

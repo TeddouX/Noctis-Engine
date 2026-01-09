@@ -4,7 +4,7 @@
 #include <noctis_engine/core/scene.hpp>
 #include <noctis_engine/rendering/window.hpp>
 #include <noctis_engine/rendering/graphics_handler.hpp>
-#include <noctis_engine/rendering/mesh_manager.hpp>
+#include <noctis_engine/rendering/mesh/mesh_manager.hpp>
 #include <noctis_engine/rendering/texture.hpp>
 #include <noctis_engine/rendering/camera.hpp>
 #include <noctis_engine/rendering/gpu_buffer.hpp>
@@ -68,7 +68,9 @@ private:
     NoctisEngine::TextureHandle texHandle_;
     NoctisEngine::ShaderHandle  shaderHandle_;
 
-    std::shared_ptr<NoctisEngine::MeshManager> meshManager_;
+    std::shared_ptr<NoctisEngine::MeshManager>     meshManager_;
+    std::unique_ptr<NoctisEngine::MaterialManager> materialManager_;
+
     NoctisEngine::GPUBuffer testUB_;
     NoctisEngine::GPUBuffer modelSSBO_;
     glm::mat4x4             modelMatrix_;
