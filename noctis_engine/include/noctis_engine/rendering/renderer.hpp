@@ -13,7 +13,7 @@ public:
 
 private:
     std::shared_ptr<MeshManager> meshManager_;
-    GPUBuffer                    modelMatSSBO_;
+    GPUBuffer                    objectsSSBO_;
     GPUBuffer                    commandBuf_;
 };
 

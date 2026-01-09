@@ -1,6 +1,6 @@
 #include <rendering/texture.hpp>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include <core/assert.hpp>
 
@@ -13,11 +13,6 @@ Texture::Texture(TextureInfo texInfo)
     glGenTextures(1, &texId_);
     glBindTexture(GL_TEXTURE_2D, texId_);
     glObjectLabel(GL_TEXTURE, texId_, -1, name_.c_str());
-
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     GLenum internalFormat = GL_RGBA8;
     GLenum dataFormat = GL_RGBA;
@@ -81,6 +76,10 @@ auto Texture::set_wrap_function(WrapParam paramU, WrapParam paramV) const -> voi
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, static_cast<GLint>(paramU));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, static_cast<GLint>(paramV));
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+auto Texture::gl_handle() const -> std::uint32_t {
+    return texId_; 
 }
 
 } // namespace NoctisEngine

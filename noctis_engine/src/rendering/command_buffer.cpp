@@ -3,7 +3,7 @@
 #include <rendering/mesh_view.hpp>
 #include <ecs/component/transform.hpp>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 namespace NoctisEngine
 {

@@ -1,6 +1,6 @@
 #include <rendering/mesh_manager.hpp>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include <rendering/vertex.hpp>
 #include <core/logging.hpp>

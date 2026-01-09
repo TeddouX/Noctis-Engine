@@ -49,6 +49,8 @@ public:
     auto set_mag_function(MagnifyingFunction param) const -> void;
     auto set_wrap_function(WrapParam paramU, WrapParam paramV) const -> void;
 
+    auto gl_handle() const -> std::uint32_t;
+
 private:
     uint32_t texId_;
     std::string name_;

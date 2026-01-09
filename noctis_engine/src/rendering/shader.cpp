@@ -1,6 +1,6 @@
 #include <rendering/shader.hpp>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include <print>
 
@@ -17,7 +17,7 @@ Shader::Shader(const std::string &code, const std::string &name) {
     glObjectLabel(GL_SHADER, vertShader_, -1, name.c_str());
     glObjectLabel(GL_SHADER, fragShader_, -1, name.c_str());
 
-    const std::string header = std::string(OPENGL_VERSION) + "\n#define ";
+    const std::string header = std::string(OPENGL_VERSION) + "\n#extension GL_ARB_bindless_texture : require" + "\n#define ";
     const std::string vertCodeStr = header + "VERTEX\n" + code;
     const std::string fragCodeStr = header + "FRAGMENT\n" + code;
 

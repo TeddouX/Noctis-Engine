@@ -30,6 +30,15 @@ enum class BufferType {
     UNIFORM_BUFFER,             // Uniform block storage
 };
 
+enum class BufferFlag : std::uint32_t {
+    MAP_READ_BIT = 0x0001,
+    MAP_WRITE_BIT = 0x0002,
+    MAP_PERSISTENT_BIT = 0x0040,
+    MAP_COHERENT_BIT = 0x0080,
+    DYNAMIC_STORAGE_BIT = 0x0100,
+    CLIENT_STORAGE_BIT = 0x0200
+};
+
 NCENG_API auto to_string(BufferType type) -> std::string;
 
 using CPUBufferView = const std::span<const std::byte>;
@@ -37,7 +46,7 @@ using CPUBufferView = const std::span<const std::byte>;
 class NCENG_API GPUBuffer {
 public:
     GPUBuffer() = default;
-    GPUBuffer(size_t size, std::string_view name);
+    GPUBuffer(size_t size, std::string_view name, BufferFlag flags = BufferFlag::DYNAMIC_STORAGE_BIT);
 
     auto copy_to(GPUBuffer &other) -> void;
     auto write(CPUBufferView data, size_t offset) const -> void;
@@ -50,9 +59,14 @@ public:
     auto bind_buffer_base(BufferType type, uint32_t bindPoint) const -> void;
     auto bind_buffer_range(BufferType type, uint32_t bindPoint, size_t offset, size_t size) const -> void;
 
+    auto map(bool readable) -> void;
+    auto unmap() -> void;
+    auto mapped_write(CPUBufferView data, size_t offset) -> void;
+
 private:
     uint32_t id_{};
-    size_t size_{};
+    size_t   size_{};
+    void     *map_;
 };
 
 struct GPUBufferBlock {

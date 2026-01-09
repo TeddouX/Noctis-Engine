@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <format>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include <core/exception.hpp>
 #include <core/logging.hpp>
@@ -16,11 +16,11 @@ namespace NoctisEngine
 static auto opengl_buffer_type(BufferType type) -> GLenum;
 static auto is_bindable_to_index(BufferType type) -> bool;
 
-GPUBuffer::GPUBuffer(size_t size, std::string_view name)
+GPUBuffer::GPUBuffer(size_t size, std::string_view name, BufferFlag flags)
     : size_(size)
 {
     glCreateBuffers(1, &id_);
-    glNamedBufferStorage(id_, size, nullptr, GL_DYNAMIC_STORAGE_BIT);
+    glNamedBufferStorage(id_, size, nullptr, static_cast<GLbitfield>(flags));
     glObjectLabel(GL_BUFFER, id_, name.size(), name.data());
 }
 
@@ -31,8 +31,6 @@ auto GPUBuffer::write(CPUBufferView data, size_t offset) const -> void {
             data.size_bytes(), offset, size_
         );
 
-    // glm::ivec2 v{11};
-    // glNamedBufferSubData(id_, 0, sizeof(glm::vec3), &v);
     glNamedBufferSubData(id_, offset, data.size_bytes(), data.data());
 }
 
@@ -79,8 +77,36 @@ auto GPUBuffer::gl_handle() const -> std::uint32_t {
 }
 
 auto GPUBuffer::delete_gpu() -> void {
+    if (map_)
+        glUnmapNamedBuffer(id_);
     glDeleteBuffers(1, &id_);
 }
+
+auto GPUBuffer::map(bool readable) -> void {
+    map_ = glMapNamedBuffer(id_, readable ? GL_READ_WRITE : GL_WRITE_ONLY);
+    if (!map_)
+        throw Exception("Failed to map buffer.");
+}
+
+auto GPUBuffer::unmap() -> void {
+    glUnmapNamedBuffer(id_);
+}
+
+auto GPUBuffer::mapped_write(CPUBufferView data, size_t offset) -> void {
+    if (offset + data.size_bytes() > size_)
+        throw Exception(
+            "Failed to mapped_write {} bytes at offset {} into a buffer that is {} bytes long." ,
+            data.size_bytes(), offset, size_
+        );
+
+    if (!map_) {
+        Log::Warn("Tried to call GPUBuffer::mapped_write to an unmmapped buffer.");
+        return;
+    }
+
+    std::memcpy(map_ + offset, data.data(), data.size_bytes());
+}
+
 
 NCENG_API auto to_string(BufferType type) -> std::string {
     switch (type) {
