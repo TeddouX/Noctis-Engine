@@ -8,6 +8,7 @@
 #include <core/exception.hpp>
 #include <core/logging.hpp>
 #include <core/format.hpp>
+#include <math/math.hpp>
 
 namespace NoctisEngine
 {
@@ -23,14 +24,26 @@ GPUBuffer::GPUBuffer(size_t size, std::string_view name)
     glObjectLabel(GL_BUFFER, id_, name.size(), name.data());
 }
 
-auto GPUBuffer::write(CPUBufferView data, size_t offset, WriteType type) const -> void {
+auto GPUBuffer::write(CPUBufferView data, size_t offset) const -> void {
     if (offset + data.size_bytes() > size_)
         throw Exception(
             "Tried to write {} bytes at offset {} into a buffer that is {} bytes long.", 
             data.size_bytes(), offset, size_
         );
 
+    // glm::ivec2 v{11};
+    // glNamedBufferSubData(id_, 0, sizeof(glm::vec3), &v);
     glNamedBufferSubData(id_, offset, data.size_bytes(), data.data());
+}
+
+auto GPUBuffer::copy_to(GPUBuffer &other) -> void {
+    if (size_ > other.size_)
+        throw Exception(
+            "Tried copying from a buffer that is {} bytes long to a buffer that is {} bytes long",
+            size_, other.size_
+        );
+
+    glCopyNamedBufferSubData(id_, other.id_, 0, 0, size_);
 }
 
 auto GPUBuffer::bind_as(BufferType type) const -> void {
@@ -61,14 +74,12 @@ auto GPUBuffer::size() const -> size_t {
     return size_;
 }
 
-auto GPUBuffer::name() const -> std::string_view {
-    int nameSize{};
-    glGetObjectLabel(GL_BUFFER, id_, 0, &nameSize, nullptr);
+auto GPUBuffer::gl_handle() const -> std::uint32_t {
+    return id_;
+}
 
-    auto name = (char *)std::malloc(nameSize);
-    glGetObjectLabel(GL_BUFFER, id_, nameSize, nullptr, name);
-
-    return name;
+auto GPUBuffer::delete_gpu() -> void {
+    glDeleteBuffers(1, &id_);
 }
 
 NCENG_API auto to_string(BufferType type) -> std::string {

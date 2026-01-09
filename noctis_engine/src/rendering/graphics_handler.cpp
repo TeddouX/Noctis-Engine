@@ -62,8 +62,10 @@ void GraphicsHandler::OpenGLDbgMessCallback(uint32_t source, uint32_t type, uint
 ) {
     if (severity == GL_DEBUG_SEVERITY_LOW)
         Log::Info("OpenGL: {}", message);
-    else if (severity == GL_DEBUG_SEVERITY_MEDIUM)
+    else if (severity == GL_DEBUG_SEVERITY_MEDIUM) {
         Log::Warn("OpenGL: {}", message);
+        Log::Warn("Stacktrace:\n{}", std::stacktrace::current(1));
+    }
     else if (severity == GL_DEBUG_SEVERITY_HIGH) {
         auto gh = static_cast<const GraphicsHandler *>(userParam);
 

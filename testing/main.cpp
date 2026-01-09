@@ -1,11 +1,11 @@
 #include <noctis_engine/rendering/shader.hpp>
-#include <noctis_engine/rendering/vertex_array.hpp>
 #include <noctis_engine/rendering/camera.hpp>
 #include <noctis_engine/rendering/window.hpp>
 #include <noctis_engine/rendering/graphics_handler.hpp>
 #include <noctis_engine/input/input_system.hpp>
 #include <noctis_engine/core/logging.hpp>
 #include <noctis_engine/core/entrypoint.hpp>
+#include <noctis_engine/ecs/component/transform.hpp>
 #include <noctis_engine/asset/asset_manager.hpp>
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -20,7 +20,9 @@
 TestApp::TestApp() 
     : window_(800, 600, "Testing")
     , assetManager_(std::make_unique<NoctisEngine::AssetManager>())
-    , camera_(glm::vec3(-5, 1, 2), 800/600, 70.f, .1f, 1000.f) 
+    , meshManager_(std::make_shared<NoctisEngine::MeshManager>())
+    , camera_(glm::vec3(-5, 1, 2), 800/600, 70.f, .1f, 1000.f)
+    , scene_(meshManager_)
 {
     graphicsHandler_.set_clear_screen_color(NoctisEngine::Color{9, 9, 9, 255});
     graphicsHandler_.set_backface_culling(false);
@@ -42,15 +44,15 @@ TestApp::TestApp()
         texture->set_mag_function(NoctisEngine::Texture::MagnifyingFunction::NEAREST);
         texture->set_wrap_function(NoctisEngine::Texture::WrapParam::REPEAT, NoctisEngine::Texture::WrapParam::REPEAT);
     }
-
-    modelSSBO_ = NoctisEngine::GPUBuffer(sizeof(glm::mat4), "model_SSBO");
-    modelSSBO_.bind_buffer_base(NoctisEngine::BufferType::SHADER_STORAGE_BUFFER, 2);
-
-    modelMatrix_ = create_model_matrix(glm::vec3(0, 1, 0), glm::vec3(0, 90, 0), glm::vec3(1));
-    modelSSBO_.write(NoctisEngine::get_cpu_buffer_view(modelMatrix_), 0, NoctisEngine::WriteType::DYNAMIC_DRAW);
-
-    vertArray_ = NoctisEngine::VertexArray(PLANE);
+    
+    auto meshView = meshManager_->upload(CUBE);
+    for (int i = 0; i < 3; i++) {
+        auto entity = scene_.create_entity();
+        entity.add_component(meshView);
+        entity.add_component(NoctisEngine::Transform{glm::vec3(i, 0, 0), glm::vec3(1), glm::vec3(0)});
+    }
 }
+
 
 auto TestApp::run() -> void {
     window_.lock_cursor();
@@ -100,16 +102,14 @@ auto TestApp::run() -> void {
 
         double time = window_.get_time();
 
-        modelMatrix_ = create_model_matrix(glm::vec3(0, sin(time + 0.0f) * 0.5f, 0), glm::vec3(0, time * 8, 0), glm::vec3(1));
-        modelSSBO_.write(NoctisEngine::get_cpu_buffer_view(modelMatrix_), 0, NoctisEngine::WriteType::DYNAMIC_DRAW);
-
         camera_.upload_data();
 
         shader->bind();
-        texture->bind(0, shader);  
+        texture->bind(0, shader);
 
-        vertArray_.use();
-
+        scene_.update(dt);
+        scene_.render(dt);
+        
         window_.poll_events();
         window_.swap_buffers();
     }
@@ -117,21 +117,4 @@ auto TestApp::run() -> void {
 
 auto NoctisEngine::create_application(int argc, char **argv) -> NoctisEngine::Application * {
     return new TestApp;
-}
-
-
-auto create_model_matrix(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale) -> glm::mat4x4 {
-    // Identity
-    glm::mat4x4 model(1);
-
-    // Translation
-    model = glm::translate(model, pos);
-    // Rotation
-    glm::quat quaternion(glm::radians(rot));
-    glm::mat4x4 rotationMatrix = glm::toMat4(quaternion);
-    model *= rotationMatrix;
-    // Scale
-    model = glm::scale(model, scale);
-
-    return model;
 }

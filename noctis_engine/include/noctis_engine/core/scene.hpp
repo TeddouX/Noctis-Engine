@@ -1,36 +1,48 @@
 #pragma once
 #include "../ecs/ecs.hpp"
 #include "../ecs/entity.hpp"
+#include "../rendering/mesh_manager.hpp"
+#include "../rendering/gpu_buffer.hpp"
+#include "../rendering/renderer.hpp"
+#include "../rendering/command_buffer.hpp"
+#include "../ecs/system/system.hpp"
+#include "../ecs/system/system_storage.hpp"
 
 namespace NoctisEngine
 {
 
-class Scene {
+class NCENG_API Scene {
 public:
-    Scene() = default;
+    Scene(const std::shared_ptr<MeshManager> &meshManager);
 
     auto create_entity() -> Entity;
 
-    template <typename... FuncArgs_>
-    auto add_system(std::string_view name, void(*fun)(FuncArgs_...)) -> void;
+    template <typename Class_>
+        requires(
+            std::is_base_of_v<ISystem, Class_> && 
+            std::is_default_constructible_v<Class_>
+        )
+    auto add_system(std::string_view name, auto (Class_::*fun)(float, entt::registry &) -> void) -> void;
 
-    auto remove_system(std::string_view name) -> void;
-
-    auto update() -> void;
+    auto update(float dt) -> void;
+    auto render(float dt) -> void;
 
 private:
-    std::unordered_map<std::string_view, std::function<void(entt::registry &)>> systems_;
+    SystemStorage renderSystems_;
+    SystemStorage updateSystems_;
+
     entt::registry reg_;
+
+    Renderer renderer_;
 };
 
-template <typename... FuncArgs_>
-auto Scene::add_system(std::string_view name, void(*fun)(FuncArgs_...)) -> void {
-    auto fun = [&](entt::registry &reg) -> void {
-        auto view = reg_.view<FuncArgs_...>();
-        view.each(fun);
-    };
-
-    systems_.emplace(name, fun);
+template <typename Class_>
+    requires(
+        std::is_base_of_v<ISystem, Class_> && 
+        std::is_default_constructible_v<Class_>
+    )
+auto Scene::add_system(std::string_view name, auto (Class_::*fun)(float, entt::registry &) -> void) -> void {
+    updateSystems_.add_system(name, fun);
 }
 
 } // namespace NoctisEngine

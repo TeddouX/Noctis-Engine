@@ -68,7 +68,7 @@ auto Camera::translate_by(glm::vec3 translation) -> void {
 }
 
 void Camera::upload_data() {
-    uniformBuffer_.write(get_cpu_buffer_view(data_), 0, WriteType::DYNAMIC_DRAW);
+    uniformBuffer_.write(get_cpu_buffer_view(data_), 0);
 }
 
 auto Camera::update_view_mat() -> void {

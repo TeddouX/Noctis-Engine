@@ -8,6 +8,7 @@
 
 #include "../noctis_engine.hpp"
 #include "../core/exception.hpp"
+#include "../core/logging.hpp"
 
 namespace NoctisEngine
 {
@@ -31,39 +32,6 @@ enum class BufferType {
 
 NCENG_API auto to_string(BufferType type) -> std::string;
 
-// STREAM
-// The data store contents will be modified once and used at most a few times.
-// 
-// STATIC
-// The data store contents will be modified once and used many times.
-// 
-// DYNAMIC
-// The data store contents will be modified repeatedly and used many times.
-// 
-// The nature of access may be one of these:
-// 
-// DRAW
-// The data store contents are modified by the application, and used as the source for GL drawing and image specification commands.
-// 
-// READ
-// The data store contents are modified by reading data from the GL, and used to return that data when queried by the application.
-// 
-// COPY
-// The data store contents are modified by reading data from the GL, and used as the source for GL drawing and image specification commands.
-enum class WriteType : uint8_t {
-    STREAM_DRAW,
-    STREAM_READ,
-    STREAM_COPY,
-
-    STATIC_DRAW,
-    STATIC_READ,
-    STATIC_COPY,
-
-    DYNAMIC_DRAW,
-    DYNAMIC_READ,
-    DYNAMIC_COPY
-};
-
 using CPUBufferView = const std::span<const std::byte>;
 
 class NCENG_API GPUBuffer {
@@ -71,9 +39,12 @@ public:
     GPUBuffer() = default;
     GPUBuffer(size_t size, std::string_view name);
 
-    auto write(CPUBufferView data, size_t offset, WriteType type) const -> void;
+    auto copy_to(GPUBuffer &other) -> void;
+    auto write(CPUBufferView data, size_t offset) const -> void;
     auto size() const -> size_t;
-    auto name() const -> std::string_view;
+    auto gl_handle() const -> std::uint32_t;
+
+    auto delete_gpu() -> void;
 
     auto bind_as(BufferType type) const -> void;
     auto bind_buffer_base(BufferType type, uint32_t bindPoint) const -> void;
@@ -84,17 +55,43 @@ private:
     size_t size_{};
 };
 
+struct GPUBufferBlock {
+    std::size_t offset;
+    std::size_t size;
+};
+
 template <typename T>
-auto resize_buffer(GPUBuffer &buf, const std::vector<T> &cpuBuf) -> void {
+auto resize_buffer(GPUBuffer &buf, const std::vector<T> &cpuBuf, std::string_view name) -> void {
     size_t cpuBufSize = cpuBuf.size() * sizeof(T);
 
-    if (cpuBufSize >= buf.size()) {
-        size_t newBufSize = buf.size() * 2;
+    if (buf.size() < cpuBufSize) {
+        size_t newBufSize = std::max(buf.size() * 2, 1zu);
         while (newBufSize < cpuBufSize)
             newBufSize *= 2;
 
-        buf = GPUBuffer(newBufSize, buf.name());
+        Log::Info("Resizing buffer {}, {} => {}", name, buf.size(), newBufSize);
+
+        buf.delete_gpu();
+        buf = GPUBuffer{newBufSize, name};
     }
+}
+
+inline auto copy_resize_buffer(GPUBuffer &buf, size_t requiredSize, std::string_view name) -> bool {
+    if (buf.size() >= requiredSize)
+        return false;
+
+    size_t newBufSize = std::max(buf.size() * 2, 1zu);
+    while (newBufSize < requiredSize)
+        newBufSize *= 2;
+
+    Log::Info("Resizing buffer '{}', {} bytes => {} bytes", name, buf.size(), newBufSize);
+
+    GPUBuffer temp{newBufSize, name};
+    buf.copy_to(temp);
+    buf.delete_gpu();
+    buf = temp;
+
+    return true;
 }
 
 template <typename T>

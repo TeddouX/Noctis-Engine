@@ -2,15 +2,16 @@
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
-layout (location = 2) in vec2 aTexCoord;
+layout (location = 2) in vec3 aTangent;
+layout (location = 3) in vec2 aTexCoord;
 
 layout(std140, binding = 0) uniform CameraBuffer {
    mat4 projMat;
    mat4 viewMat;
+   vec3 pos;
 } camera;
 
-uniform int modelIdx;
-layout(std430, binding = 2) buffer ModelMatrices {
+layout(std430, binding = 1) buffer ModelMatrices {
    mat4 modelMatrices[];
 } models;
 
@@ -19,7 +20,7 @@ out vec2 TexCoord;
 
 void main()
 {
-   gl_Position = camera.projMat * camera.viewMat * models.modelMatrices[modelIdx] * vec4(aPos, 1.0);
+   gl_Position = camera.projMat * camera.viewMat * models.modelMatrices[gl_DrawID] * vec4(aPos, 1.0);
    Pos = aPos;
    TexCoord = aTexCoord;
 }
@@ -37,14 +38,10 @@ out vec4 FragColor;
 
 uniform sampler2D drone;
 
-layout(std140, binding = 1) uniform TestBuffer {
-   vec3 col;
-} test;
-
 void main()
 {
-   // FragColor = vec4(test.col, 1.0f);
-   FragColor = texture(drone, TexCoord);
+   // FragColor = texture(drone, TexCoord);
+   FragColor = vec4(1.0f);
 }
 
 #endif
