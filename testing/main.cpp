@@ -23,6 +23,7 @@ TestApp::TestApp()
     , meshManager_(std::make_shared<NoctisEngine::MeshManager>())
     , camera_(glm::vec3(-5, 1, 2), 800/600, 70.f, .1f, 1000.f)
     , scene_(meshManager_)
+    , debugUI_(window_)
 {
     graphicsHandler_.set_clear_screen_color(NoctisEngine::Color{9, 9, 9, 255});
     graphicsHandler_.set_backface_culling(false);
@@ -66,13 +67,24 @@ auto TestApp::run() -> void {
     while (!window_.should_close()) {
         if (NoctisEngine::InputSystem::is_key_pressed(NoctisEngine::Key::ESCAPE)) {
             NoctisEngine::Log::Info("Esc pressed");
-            break;
+            if (!debugUI_.hidden()) {
+                NoctisEngine::Log::Info("Hiding debug ui.");
+                debugUI_.set_enabled(false);
+            }
+            else {
+                NoctisEngine::Log::Info("Quitting");
+                break;
+            }
         }
 
-        graphicsHandler_.clear_screen();
+        if (NoctisEngine::InputSystem::is_key_pressed(NoctisEngine::Key::V)) {
+            NoctisEngine::Log::Info("Showing debug ui.");
+            debugUI_.set_enabled(true);
+        }
 
-        NoctisEngine::MouseMouvement mouseMvt = NoctisEngine::InputSystem::get_mouse_mouvement();
-        camera_.rotate_by_clamped(mouseMvt.xDelta * MOUSE_SENS, -mouseMvt.yDelta * MOUSE_SENS);
+        bool debugUIEnabled = !debugUI_.hidden();
+
+        graphicsHandler_.clear_screen();
 
         float dt = static_cast<float>(window_.delta_time());
 
@@ -89,16 +101,22 @@ auto TestApp::run() -> void {
             frameCount_ = 0;
         }
 
-        auto forward = camera_.forward();
-        auto right = camera_.right();
-        if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::W))
-            camera_.translate_by(forward * CAM_SPEED * dt);
-        if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::S))
-            camera_.translate_by(-forward * CAM_SPEED * dt);
-        if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::A))
-            camera_.translate_by(-right * CAM_SPEED * dt);
-        if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::D))
-            camera_.translate_by(right * CAM_SPEED * dt);
+        if (!debugUIEnabled) {
+            // Camera movement
+            NoctisEngine::MouseMouvement mouseMvt = NoctisEngine::InputSystem::get_mouse_mouvement();
+            camera_.rotate_by_clamped(mouseMvt.xDelta * MOUSE_SENS, -mouseMvt.yDelta * MOUSE_SENS);
+
+            auto forward = camera_.forward();
+            auto right = camera_.right();
+            if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::W))
+                camera_.translate_by(forward * CAM_SPEED * dt);
+            if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::S))
+                camera_.translate_by(-forward * CAM_SPEED * dt);
+            if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::A))
+                camera_.translate_by(-right * CAM_SPEED * dt);
+            if (NoctisEngine::InputSystem::is_key_down(NoctisEngine::Key::D))
+                camera_.translate_by(right * CAM_SPEED * dt);
+        }
 
         double time = window_.get_time();
 
@@ -108,6 +126,8 @@ auto TestApp::run() -> void {
 
         scene_.update(dt);
         scene_.render(dt);
+
+        debugUI_.render();
         
         window_.poll_events();
         window_.swap_buffers();

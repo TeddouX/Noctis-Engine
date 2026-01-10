@@ -8,6 +8,7 @@
 #include <noctis_engine/rendering/texture.hpp>
 #include <noctis_engine/rendering/camera.hpp>
 #include <noctis_engine/rendering/gpu_buffer.hpp>
+#include <noctis_engine/debug/debug_ui.hpp>
 
 
 constexpr float MOUSE_SENS = 1.0f/10.0f;
@@ -74,6 +75,8 @@ private:
     NoctisEngine::Camera          camera_;
 
     NoctisEngine::Scene scene_;
+
+    NoctisEngine::DebugUI debugUI_;
 
     double timeAcc_{};
     int frameCount_{};

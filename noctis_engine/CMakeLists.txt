@@ -42,6 +42,7 @@ set(NOCTIS_ENGINE_SOURCES
     "src/asset/asset_manager.cpp"
     "src/input/input_system.cpp"
     "src/core/scene.cpp"
+    "src/debug/debug_ui.cpp"
     "src/ecs/component/transform.cpp"
     "src/rendering/material/material_manager.cpp"
     "src/rendering/mesh/mesh_manager.cpp"
@@ -61,6 +62,7 @@ add_library(NoctisEngine SHARED ${NOCTIS_ENGINE_SOURCES})
 target_link_libraries(NoctisEngine
     EnTT::EnTT
     glm::glm
+    ImGui
     glfw
     Glad
     stb

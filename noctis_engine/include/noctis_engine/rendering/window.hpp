@@ -30,6 +30,8 @@ public:
 
     auto set_title(const std::string &newTitle) const -> void { glfwSetWindowTitle(m_glfwWindow, newTitle.c_str()); }
 
+    auto glfw_ptr() -> GLFWwindow * { return m_glfwWindow; }
+
 private:
     GLFWwindow *m_glfwWindow = nullptr;
 
