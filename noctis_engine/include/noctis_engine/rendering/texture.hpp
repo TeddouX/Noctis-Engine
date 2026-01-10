@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "../noctis_engine.hpp"
+#include "../math/color.hpp"
 #include "shader.hpp"
 
 namespace NoctisEngine
@@ -50,6 +51,8 @@ public:
     auto set_wrap_function(WrapParam paramU, WrapParam paramV) const -> void;
 
     auto gl_handle() const -> std::uint32_t;
+
+    static auto create_1x1_texture(Color col, std::string_view name) -> Texture;
 
 private:
     uint32_t texId_;

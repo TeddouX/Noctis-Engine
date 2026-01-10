@@ -8,8 +8,7 @@ namespace NoctisEngine
     
 struct alignas(16) MaterialData {
     glm::vec4 baseColor{1};
-    // TODO: default to 1x1 white texture
-    BindlessTexture albedo{};
+    BindlessTexture albedo{BindlessTexture::default_textures().white_1x1};
 
     MaterialData() = default;
 

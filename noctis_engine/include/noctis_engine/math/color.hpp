@@ -25,7 +25,7 @@ public:
     constexpr auto blue_f() const -> float { return m_b / 255; }
     constexpr auto alpha_f() const -> float { return m_a / 255; }
 
-    constexpr auto to_vec4() const -> glm::vec4 { 
+    constexpr auto to_floats() const -> glm::vec4 { 
         return glm::vec4{red_f(), green_f(), blue_f(), alpha_f()};
     }
 

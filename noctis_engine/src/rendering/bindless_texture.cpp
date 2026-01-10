@@ -25,4 +25,16 @@ auto BindlessTexture::get_handle() const -> std::uint64_t {
     return handle_;
 }
 
+auto BindlessTexture::default_textures() -> const DefaultTextures & {
+    static DefaultTextures d{
+        .white_1x1 = BindlessTexture{
+            Texture::create_1x1_texture(
+                Color{255, 255, 255}, 
+                "1x1_White"
+            )
+        },
+    };
+    return d;
+}
+
 } // namespace NoctisEngine

@@ -82,4 +82,15 @@ auto Texture::gl_handle() const -> std::uint32_t {
     return texId_; 
 }
 
+auto Texture::create_1x1_texture(Color col, std::string_view name) -> Texture {
+    static uint8_t data[]{col.red(), col.green(), col.blue()};
+    static Texture tex{TextureInfo{
+        .data = data,
+        .width = 1, .height = 1,
+        .nrChannels = 3,
+        .name = std::string(name)
+    }};
+    return tex;
+};
+
 } // namespace NoctisEngine

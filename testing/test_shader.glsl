@@ -63,7 +63,7 @@ Material get_material() {
 
 vec4 get_albedo() {
   Material mat = get_material();
-  return texture(mat.albedo, fsTexCoord);
+  return texture(mat.albedo, fsTexCoord) * mat.baseColor;
 }
 
 
