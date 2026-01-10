@@ -62,7 +62,7 @@ public:
     auto run() -> void override;
 
 private:
-    NoctisEngine::Window window_;
+    std::shared_ptr<NoctisEngine::Window> window_;
     NoctisEngine::GraphicsHandler graphicsHandler_;
     
     std::unique_ptr<NoctisEngine::AssetManager> assetManager_;
@@ -77,7 +77,4 @@ private:
     NoctisEngine::Scene scene_;
 
     NoctisEngine::DebugUI debugUI_;
-
-    double timeAcc_{};
-    int frameCount_{};
 };

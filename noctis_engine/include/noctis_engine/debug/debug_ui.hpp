@@ -11,18 +11,20 @@ namespace NoctisEngine
     
 class NCENG_API DebugUI {
 public:
-    DebugUI(Window &window);
+    DebugUI(std::shared_ptr<Window> window);
     ~DebugUI();
 
-    auto add_widget(std::shared_ptr<IDebugWidget> widget);
+    auto add_widget(std::shared_ptr<IDebugWidget> widget) -> void;
     auto set_enabled(bool b) -> void;
     auto render() -> void;
 
     auto hidden() const -> bool;
 
+    auto window() const -> const std::shared_ptr<Window> &;
+
 private:
-    std::vector<std::shared_ptr<IDebugWidget>> widgets;
-    Window window_;
+    std::vector<std::shared_ptr<IDebugWidget>> widgets_;
+    std::shared_ptr<Window> window_;
     bool hidden_;
 };
     

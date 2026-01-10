@@ -44,6 +44,8 @@ private:
     // In degrees
     float yaw_, pitch_;
 
+    bool dirty_;
+
     struct Data {
         glm::mat4x4 projMat;
         glm::mat4x4 viewMat;

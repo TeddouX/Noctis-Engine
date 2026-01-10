@@ -7,6 +7,7 @@
 #include <noctis_engine/core/entrypoint.hpp>
 #include <noctis_engine/ecs/component/transform.hpp>
 #include <noctis_engine/asset/asset_manager.hpp>
+#include <noctis_engine/debug/widget/stats_widget.hpp>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -18,7 +19,7 @@
 
 
 TestApp::TestApp() 
-    : window_(800, 600, "Testing")
+    : window_(std::make_shared<NoctisEngine::Window>(800, 600, "Testing"))
     , assetManager_(std::make_unique<NoctisEngine::AssetManager>())
     , meshManager_(std::make_shared<NoctisEngine::MeshManager>())
     , camera_(glm::vec3(-5, 1, 2), 800/600, 70.f, .1f, 1000.f)
@@ -55,18 +56,19 @@ TestApp::TestApp()
         entity.add_component(NoctisEngine::Transform{glm::vec3(0, i*2, 0), glm::vec3(1), glm::vec3(0)});
         entity.add_component(materialKey);
     }
+
+    debugUI_.add_widget(std::make_shared<NoctisEngine::StatsDbgWidget>());
 }
 
 auto TestApp::run() -> void {
-    window_.lock_cursor();
+    window_->lock_cursor();
 
     auto shader = assetManager_->try_get(shaderHandle_);
     if (!shader) 
         throw NoctisEngine::Exception("Getting the shader failed.");
 
-    while (!window_.should_close()) {
+    while (!window_->should_close()) {
         if (NoctisEngine::InputSystem::is_key_pressed(NoctisEngine::Key::ESCAPE)) {
-            NoctisEngine::Log::Info("Esc pressed");
             if (!debugUI_.hidden()) {
                 NoctisEngine::Log::Info("Hiding debug ui.");
                 debugUI_.set_enabled(false);
@@ -82,26 +84,10 @@ auto TestApp::run() -> void {
             debugUI_.set_enabled(true);
         }
 
-        bool debugUIEnabled = !debugUI_.hidden();
-
         graphicsHandler_.clear_screen();
 
-        float dt = static_cast<float>(window_.delta_time());
-
-        timeAcc_ += dt;
-        frameCount_++;
-
-        if (timeAcc_ >= 1.0) {
-            double averageFPS = frameCount_ / timeAcc_;
-            double frameTime = 1000.0 / averageFPS;
-
-            window_.set_title(std::format("Testing | FPS: {:.3f} | {:.3f} ms", averageFPS, frameTime));
-
-            timeAcc_ = 0.0;
-            frameCount_ = 0;
-        }
-
-        if (!debugUIEnabled) {
+        float dt = static_cast<float>(window_->delta_time());
+        if (debugUI_.hidden()) {
             // Camera movement
             NoctisEngine::MouseMouvement mouseMvt = NoctisEngine::InputSystem::get_mouse_mouvement();
             camera_.rotate_by_clamped(mouseMvt.xDelta * MOUSE_SENS, -mouseMvt.yDelta * MOUSE_SENS);
@@ -118,8 +104,6 @@ auto TestApp::run() -> void {
                 camera_.translate_by(right * CAM_SPEED * dt);
         }
 
-        double time = window_.get_time();
-
         camera_.upload_data();
 
         shader->bind();
@@ -129,8 +113,8 @@ auto TestApp::run() -> void {
 
         debugUI_.render();
         
-        window_.poll_events();
-        window_.swap_buffers();
+        window_->poll_events();
+        window_->swap_buffers();
     }
 }
 

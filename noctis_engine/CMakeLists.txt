@@ -42,6 +42,7 @@ set(NOCTIS_ENGINE_SOURCES
     "src/asset/asset_manager.cpp"
     "src/input/input_system.cpp"
     "src/core/scene.cpp"
+    "src/debug/widget/stats_widget.cpp"
     "src/debug/debug_ui.cpp"
     "src/ecs/component/transform.cpp"
     "src/rendering/material/material_manager.cpp"
