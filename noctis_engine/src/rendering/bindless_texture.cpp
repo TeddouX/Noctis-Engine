@@ -2,7 +2,7 @@
 
 #include <glad/gl.h>
 
-#include "../core/exception.hpp"
+#include <core/exception.hpp>
 
 namespace NoctisEngine
 {
@@ -12,6 +12,8 @@ BindlessTexture::BindlessTexture(Texture tex) {
 
     if (handle_ == 0)
         throw Exception("Failed to get a handle to a texture.");
+
+    make_resident(true);
 }
 
 auto BindlessTexture::make_resident(bool b) const -> void {

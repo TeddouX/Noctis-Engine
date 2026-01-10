@@ -1,10 +1,10 @@
 #include <rendering/renderer.hpp>
 
-#include <rendering/mesh/mesh_view.hpp>
-#include <ecs/component/transform.hpp>
-
 #include <glad/gl.h>
 
+#include <rendering/mesh/mesh_view.hpp>
+#include <ecs/component/transform.hpp>
+#include <rendering/buffer_utils.hpp>
 
 namespace NoctisEngine
 {
@@ -17,9 +17,9 @@ struct DrawElementsIndirectCommand {
     GLuint baseInstance;
 };
 
-struct Object {
+struct alignas(16) Object {
     glm::mat4 modelMat;
-    std::uint32_t materialIdx;
+    GLuint materialIdx;
 };
 
 
@@ -27,7 +27,7 @@ Renderer::Renderer(std::shared_ptr<MeshManager> meshManager)
     : meshManager_(meshManager)
 {
     commandBuf_ = GPUBuffer(sizeof(DrawElementsIndirectCommand), "renderer_command_buffer");
-    objectsSSBO_ = GPUBuffer(sizeof(glm::mat4), "renderer_matrices_buffer");
+    objectsSSBO_ = GPUBuffer(sizeof(Object), "renderer_object_buffer");
 }
 
 auto Renderer::render(entt::registry &reg) -> void {
@@ -47,12 +47,12 @@ auto Renderer::render(entt::registry &reg) -> void {
 
         objects.push_back(Object{
             .modelMat = transform.model_matrix(),
-            .materialIdx = static_cast<std::uint32_t>(matKey),
+            .materialIdx = static_cast<GLuint>(matKey),
         });
     }
 
     resize_buffer(commandBuf_, commands, "renderer_command_buffer");
-    resize_buffer(objectsSSBO_, objects, "renderer_matrices_buffer");
+    resize_buffer(objectsSSBO_, objects, "renderer_object_buffer");
 
     commandBuf_.write(get_cpu_buffer_view(commands, 0, commands.size()), 0);
     objectsSSBO_.write(get_cpu_buffer_view(objects, 0, objects.size()), 0);
@@ -65,7 +65,7 @@ auto Renderer::render(entt::registry &reg) -> void {
     glMultiDrawElementsIndirect(
         GL_TRIANGLES,
         GL_UNSIGNED_INT,
-        nullptr,
+        (void*)0,
         commands.size(),
         0
     );

@@ -69,12 +69,9 @@ private:
     NoctisEngine::ShaderHandle  shaderHandle_;
 
     std::shared_ptr<NoctisEngine::MeshManager>     meshManager_;
-    std::unique_ptr<NoctisEngine::MaterialManager> materialManager_;
 
-    NoctisEngine::GPUBuffer testUB_;
-    NoctisEngine::GPUBuffer modelSSBO_;
-    glm::mat4x4             modelMatrix_;
-    NoctisEngine::Camera    camera_;
+    NoctisEngine::MaterialManager materialManager_;
+    NoctisEngine::Camera          camera_;
 
     NoctisEngine::Scene scene_;
 

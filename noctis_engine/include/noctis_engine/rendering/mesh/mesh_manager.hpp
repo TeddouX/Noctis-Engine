@@ -1,8 +1,8 @@
 #pragma once
-#include "gpu_buffer.hpp"
+#include "../gpu_buffer.hpp"
 #include "mesh_info.hpp"
 #include "mesh_view.hpp"
-#include "../noctis_engine.hpp"
+#include "../../noctis_engine.hpp"
 
 namespace NoctisEngine
 {

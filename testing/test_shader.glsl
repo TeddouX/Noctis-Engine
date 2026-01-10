@@ -22,17 +22,15 @@ layout (std430, binding = 1) buffer Objects {
 } objects;
 
 
-layout (location = 0) out vec3 fsPos;
-layout (location = 1) out vec2 fsTexCoord;
-layout (location = 2) out int  fsMaterialIdx
+layout (location = 0) out vec2 fsTexCoord;
+layout (location = 1) out flat uint fsMaterialIdx;
 
 
 void main()
 {
   Object obj = objects.objects[gl_DrawID];
 
-  gl_Position = camera.projMat * camera.viewMat * obj.model * vec4(aPos, 1.0);
-  fsPos = aPos;
+  gl_Position = camera.projMat * camera.viewMat * obj.modelMat * vec4(aPos, 1.0);
   fsTexCoord = aTexCoord;
   fsMaterialIdx = obj.materialIdx;
 }
@@ -53,19 +51,19 @@ layout (std430, binding = 2) buffer Materials {
 } materials;
 
 
-layout (location = 0) in vec3 Pos;
-layout (location = 1) in vec2 TexCoord;
-layout (location = 2) in int  MaterialIdx;
+layout (location = 0) in vec2 fsTexCoord;
+layout (location = 1) in flat uint fsMaterialIdx;
 
-layout (location = 1) out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
 
 
 Material get_material() {
-  return materials.materials[materialIdx]:
+  return materials.materials[fsMaterialIdx];
 }
 
 vec4 get_albedo() {
-  return get_material().baseColor * texture(get_material().albedo, TexCoord);
+  Material mat = get_material();
+  return texture(mat.albedo, fsTexCoord);
 }
 
 

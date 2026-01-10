@@ -45,6 +45,7 @@ set(NOCTIS_ENGINE_SOURCES
     "src/ecs/component/transform.cpp"
     "src/rendering/material/material_manager.cpp"
     "src/rendering/mesh/mesh_manager.cpp"
+    "src/rendering/bindless_texture.cpp"
     "src/rendering/camera.cpp"
     "src/rendering/command_buffer.cpp"
     "src/rendering/gpu_buffer.cpp"

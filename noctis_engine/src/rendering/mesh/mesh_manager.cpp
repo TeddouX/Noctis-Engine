@@ -3,6 +3,7 @@
 #include <glad/gl.h>
 
 #include <rendering/vertex.hpp>
+#include <rendering/buffer_utils.hpp>
 #include <core/logging.hpp>
 
 namespace NoctisEngine

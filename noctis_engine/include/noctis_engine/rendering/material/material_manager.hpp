@@ -1,11 +1,12 @@
 #pragma once
 #include "../gpu_buffer.hpp"
+#include "../../noctis_engine.hpp"
 #include "material.hpp"
 
 namespace NoctisEngine
 {
     
-class MaterialManager {
+class NCENG_API MaterialManager {
 public:
     MaterialManager();
 

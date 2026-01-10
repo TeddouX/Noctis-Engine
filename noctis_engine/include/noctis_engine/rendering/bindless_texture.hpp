@@ -4,7 +4,7 @@
 namespace NoctisEngine
 {
     
-class BindlessTexture {
+class NCENG_API BindlessTexture {
 public:
     BindlessTexture() = default;
     BindlessTexture(Texture tex);

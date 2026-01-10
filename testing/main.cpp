@@ -21,7 +21,6 @@ TestApp::TestApp()
     : window_(800, 600, "Testing")
     , assetManager_(std::make_unique<NoctisEngine::AssetManager>())
     , meshManager_(std::make_shared<NoctisEngine::MeshManager>())
-    , materialManager_(std::make_unique<NoctisEngine::MaterialManager>())
     , camera_(glm::vec3(-5, 1, 2), 800/600, 70.f, .1f, 1000.f)
     , scene_(meshManager_)
 {
@@ -44,27 +43,25 @@ TestApp::TestApp()
     texture->set_mag_function(NoctisEngine::Texture::MagnifyingFunction::NEAREST);
     texture->set_wrap_function(NoctisEngine::Texture::WrapParam::REPEAT, NoctisEngine::Texture::WrapParam::REPEAT);
     
-    auto meshView = meshManager_->upload(CUBE);
-    NoctisEngine::MaterialData materialData{
+    auto meshView = meshManager_->upload(PLANE);
+    auto materialKey = materialManager_.upload(NoctisEngine::MaterialData{
         NoctisEngine::BindlessTexture{*texture}
-    };
-    
-    for (int i = 0; i < 3; i++) {
+    });
+
+    for (int i = 0; i < 4; i++) {
         auto entity = scene_.create_entity();
         entity.add_component(meshView);
-        entity.add_component(NoctisEngine::Transform{glm::vec3(i, 0, 0), glm::vec3(1), glm::vec3(0)});
+        entity.add_component(NoctisEngine::Transform{glm::vec3(0, i*2, 0), glm::vec3(1), glm::vec3(0)});
+        entity.add_component(materialKey);
     }
 }
-
 
 auto TestApp::run() -> void {
     window_.lock_cursor();
 
     auto shader = assetManager_->try_get(shaderHandle_);
-    auto texture = assetManager_->try_get(texHandle_);
-
-    if(shader == nullptr || texture == nullptr) 
-        throw NoctisEngine::Exception("Getting the texture and shader failed.");
+    if (!shader) 
+        throw NoctisEngine::Exception("Getting the shader failed.");
 
     while (!window_.should_close()) {
         if (NoctisEngine::InputSystem::is_key_pressed(NoctisEngine::Key::ESCAPE)) {
@@ -108,7 +105,6 @@ auto TestApp::run() -> void {
         camera_.upload_data();
 
         shader->bind();
-        texture->bind(0, shader);
 
         scene_.update(dt);
         scene_.render(dt);

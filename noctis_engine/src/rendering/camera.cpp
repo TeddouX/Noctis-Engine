@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <core/logging.hpp>
+#include <rendering/buffer_utils.hpp>
 
 namespace NoctisEngine
 {

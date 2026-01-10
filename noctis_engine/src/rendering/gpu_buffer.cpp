@@ -24,7 +24,7 @@ GPUBuffer::GPUBuffer(size_t size, std::string_view name, BufferFlag flags)
     glObjectLabel(GL_BUFFER, id_, name.size(), name.data());
 }
 
-auto GPUBuffer::write(CPUBufferView data, size_t offset) const -> void {
+auto GPUBuffer::write(CPUBufferReadView data, size_t offset) const -> void {
     if (offset + data.size_bytes() > size_)
         throw Exception(
             "Tried to write {} bytes at offset {} into a buffer that is {} bytes long.", 
@@ -92,7 +92,7 @@ auto GPUBuffer::unmap() -> void {
     glUnmapNamedBuffer(id_);
 }
 
-auto GPUBuffer::mapped_write(CPUBufferView data, size_t offset) -> void {
+auto GPUBuffer::mapped_write(CPUBufferReadView data, size_t offset) -> void {
     if (offset + data.size_bytes() > size_)
         throw Exception(
             "Failed to mapped_write {} bytes at offset {} into a buffer that is {} bytes long." ,
@@ -104,10 +104,10 @@ auto GPUBuffer::mapped_write(CPUBufferView data, size_t offset) -> void {
         return;
     }
 
-    std::memcpy(map_ + offset, data.data(), data.size_bytes());
+    std::memcpy(reinterpret_cast<std::byte *>(map_) + offset, data.data(), data.size_bytes());
 }
 
-auto GPUBuffer::get_data(std::size_t offset, CPUBufferView &data) const -> void {
+auto GPUBuffer::get_data(std::size_t offset, CPUBufferWriteView data) const -> void {
     if (offset + data.size_bytes() > size_)
         throw Exception(
             "Failed to read data at offset {} with an object size of {} bytes because it exceeds the buffer's size ({} bytes)" ,
@@ -118,8 +118,7 @@ auto GPUBuffer::get_data(std::size_t offset, CPUBufferView &data) const -> void 
         id_, 
         offset, 
         data.size_bytes(), 
-        // sorry
-        const_cast<std::span<std::byte> &>(data).data()
+        data.data()
     );
 }
 

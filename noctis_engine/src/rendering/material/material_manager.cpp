@@ -1,4 +1,5 @@
 #include <rendering/material/material_manager.hpp>
+#include <rendering/buffer_utils.hpp>
 
 namespace NoctisEngine
 {
@@ -18,6 +19,7 @@ auto MaterialManager::upload(const MaterialData &data) -> MaterialKey {
         "material_manager_material_data"
     );
     materialsSSBO_.write(get_cpu_buffer_view(data), materialOff_);
+    materialsSSBO_.bind_buffer_base(BufferType::SHADER_STORAGE_BUFFER, 2);
     
     materialOff_ += sizeof(MaterialData);
     

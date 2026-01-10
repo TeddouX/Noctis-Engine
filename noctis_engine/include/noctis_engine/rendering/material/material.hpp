@@ -1,14 +1,17 @@
 #pragma once
 #include <cstdint>
 #include "../../math/color.hpp"
-#include "../rendering/bindless_texture.hpp"
+#include "../bindless_texture.hpp"
 
 namespace NoctisEngine
 {
     
-struct MaterialData {
+struct alignas(16) MaterialData {
     glm::vec4 baseColor{1};
-    BindlessTexture albedo;
+    // TODO: default to 1x1 white texture
+    BindlessTexture albedo{};
+
+    MaterialData() = default;
 
     MaterialData(BindlessTexture albedo)
         : albedo(albedo)
