@@ -1,9 +1,11 @@
 #include <rendering/command_buffer.hpp>
 
-#include <rendering/mesh_view.hpp>
-#include <ecs/component/transform.hpp>
+#include <glad/gl.h>
 
-#include <glad/glad.h>
+#include <rendering/mesh/mesh_view.hpp>
+#include <ecs/component/transform.hpp>
+#include <rendering/buffer_utils.hpp>
+
 
 namespace NoctisEngine
 {

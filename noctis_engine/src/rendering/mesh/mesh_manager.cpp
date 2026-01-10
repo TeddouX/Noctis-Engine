@@ -1,8 +1,9 @@
-#include <rendering/mesh_manager.hpp>
+#include <rendering/mesh/mesh_manager.hpp>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include <rendering/vertex.hpp>
+#include <rendering/buffer_utils.hpp>
 #include <core/logging.hpp>
 
 namespace NoctisEngine

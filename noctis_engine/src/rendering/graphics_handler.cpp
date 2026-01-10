@@ -3,7 +3,7 @@
 #include <print>
 #include <stacktrace>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
 #include <core/logging.hpp>
@@ -18,7 +18,7 @@ static auto glad_enable_disable(bool b, GLenum name) -> void {
 }
 
 GraphicsHandler::GraphicsHandler() {
-    if (!gladLoadGL()) {
+    if (!gladLoadGL(glfwGetProcAddress)) {
         std::println("Failed to load OpenGL functions.");
         glfwTerminate();
         exit(-1);

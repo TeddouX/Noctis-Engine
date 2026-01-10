@@ -1,5 +1,6 @@
 #pragma once
-#include "mesh_manager.hpp"
+#include "mesh/mesh_manager.hpp"
+#include "material/material_manager.hpp"
 #include "../ecs/ecs.hpp"
 
 namespace NoctisEngine
@@ -13,7 +14,7 @@ public:
 
 private:
     std::shared_ptr<MeshManager> meshManager_;
-    GPUBuffer                    modelMatSSBO_;
+    GPUBuffer                    objectsSSBO_;
     GPUBuffer                    commandBuf_;
 };
 

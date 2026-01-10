@@ -1,7 +1,8 @@
 #pragma once
 #include "../ecs/ecs.hpp"
 #include "../ecs/entity.hpp"
-#include "../rendering/mesh_manager.hpp"
+#include "../rendering/mesh/mesh_manager.hpp"
+#include "../rendering/material/material_manager.hpp"
 #include "../rendering/gpu_buffer.hpp"
 #include "../rendering/renderer.hpp"
 #include "../rendering/command_buffer.hpp"

@@ -1,7 +1,5 @@
 #include <core/scene.hpp>
 
-#include <glad/glad.h>
-
 #include <ecs/component/transform.hpp>
 
 namespace NoctisEngine

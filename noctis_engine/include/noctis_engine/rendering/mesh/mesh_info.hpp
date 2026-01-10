@@ -2,8 +2,8 @@
 #include <vector>
 #include <string_view>
 
-#include "../noctis_engine.hpp"
-#include "vertex.hpp"
+#include "../../noctis_engine.hpp"
+#include "../vertex.hpp"
 
 namespace NoctisEngine
 {
