@@ -7,6 +7,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/entt)
 add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/glad)
 add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/glfw)
 add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/glm)
+add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/imgui)
 add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/stb)
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/noctis_engine)
