@@ -73,8 +73,10 @@ void GraphicsHandler::OpenGLDbgMessCallback(uint32_t source, uint32_t type, uint
             Log::Error("OpenGL Error: {}", message);
             throw Exception("An OpenGL error has been generated and throw on error is enabled, for more info see above.");
         }
-        else
+        else {
             Log::Error("OpenGL: {}", message);
+            Log::Error("Stacktrace:\n{}", std::stacktrace::current(1));
+        }
     }
 }
 

@@ -5,36 +5,20 @@ namespace NoctisEngine
 {
     
 template <typename T>
-auto resize_buffer(GPUBuffer &buf, const std::vector<T> &cpuBuf, std::string_view name) -> void {
+auto resize_buffer(GPUBuffer &buf, const std::vector<T> &cpuBuf) -> bool {
     size_t cpuBufSize = cpuBuf.size() * sizeof(T);
 
-    if (buf.size() < cpuBufSize) {
-        size_t newBufSize = std::max(buf.size() * 2, 1zu);
-        while (newBufSize < cpuBufSize)
-            newBufSize *= 2;
-
-        Log::Info("Resizing buffer {}, {} => {}", name, buf.size(), newBufSize);
-
-        buf.delete_gpu();
-        buf = GPUBuffer{newBufSize, name};
-    }
-}
-
-inline auto copy_resize_buffer(GPUBuffer &buf, size_t requiredSize, std::string_view name) -> bool {
-    if (buf.size() >= requiredSize)
+    if (buf.size() >= cpuBufSize) 
         return false;
 
     size_t newBufSize = std::max(buf.size() * 2, 1zu);
-    while (newBufSize < requiredSize)
+    while (newBufSize < cpuBufSize)
         newBufSize *= 2;
-
-    Log::Info("Resizing buffer '{}', {} bytes => {} bytes", name, buf.size(), newBufSize);
-
-    GPUBuffer temp{newBufSize, name};
-    buf.copy_to(temp);
+    
+    Log::Info("Resizing buffer '{}', {} => {}", buf.get_name(), buf.size(), newBufSize);
     buf.delete_gpu();
-    buf = temp;
-
+    buf = GPUBuffer{newBufSize, buf.get_name()};
+            
     return true;
 }
 

@@ -17,13 +17,16 @@ public:
 private:
     std::uint32_t VAO_;
 
-    GPUBuffer     verticesBuf_;
-    GPUBuffer     indicesBuf_;
+    std::vector<Vertex>        verticesCPUBuf_;
+    std::vector<std::uint32_t> indicesCPUBuf_;
+
+    GPUBuffer     verticesGPUBuf_;
+    GPUBuffer     indicesGPUBuf_;
 
     std::size_t   verticesOff_;
     std::size_t   indicesOff_;
 
-    std::vector<GPUBufferBlock> freeBlocks_;
+    // std::vector<GPUBufferBlock> freeBlocks_;
 
     auto generate_vertex_attributes() -> void;
 };

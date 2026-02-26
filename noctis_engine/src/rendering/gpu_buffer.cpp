@@ -18,6 +18,7 @@ static auto is_bindable_to_index(BufferType type) -> bool;
 
 GPUBuffer::GPUBuffer(size_t size, std::string_view name, BufferFlag flags)
     : size_(size)
+    , name_(name)
 {
     glCreateBuffers(1, &id_);
     glNamedBufferStorage(id_, size, nullptr, static_cast<GLbitfield>(flags));
@@ -120,6 +121,10 @@ auto GPUBuffer::get_data(std::size_t offset, CPUBufferWriteView data) const -> v
         data.size_bytes(), 
         data.data()
     );
+}
+
+auto GPUBuffer::get_name() const -> std::string_view {
+    return name_;
 }
 
 

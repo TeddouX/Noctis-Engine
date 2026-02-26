@@ -14,8 +14,8 @@ public:
     auto get_material(MaterialKey key) -> MaterialData;
 
 private:
+    std::vector<MaterialData> materialsCPU_;
     GPUBuffer     materialsSSBO_;
-    std::size_t   materialOff_;
     std::uint32_t currKey_;
 };
 

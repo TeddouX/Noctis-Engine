@@ -26,8 +26,8 @@ struct alignas(16) Object {
 Renderer::Renderer(std::shared_ptr<MeshManager> meshManager)
     : meshManager_(meshManager)
 {
-    commandBuf_ = GPUBuffer(sizeof(DrawElementsIndirectCommand), "renderer_command_buffer");
-    objectsSSBO_ = GPUBuffer(sizeof(Object), "renderer_object_buffer");
+    commandBuf_ = GPUBuffer(1, "renderer_command_buffer");
+    objectsSSBO_ = GPUBuffer(1, "renderer_object_buffer");
 }
 
 auto Renderer::render(entt::registry &reg) -> void {
@@ -51,8 +51,8 @@ auto Renderer::render(entt::registry &reg) -> void {
         });
     }
 
-    resize_buffer(commandBuf_, commands, "renderer_command_buffer");
-    resize_buffer(objectsSSBO_, objects, "renderer_object_buffer");
+    resize_buffer(commandBuf_, commands);
+    resize_buffer(objectsSSBO_, objects);
 
     commandBuf_.write(get_cpu_buffer_view(commands, 0, commands.size()), 0);
     objectsSSBO_.write(get_cpu_buffer_view(objects, 0, objects.size()), 0);
