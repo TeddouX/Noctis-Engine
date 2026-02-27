@@ -1,12 +1,12 @@
 #pragma once
-#include <GLFW/glfw3.h>
-
 #include <string>
 #include <memory>
 #include <queue>
 
 #include "../../noctis_engine.hpp"
 #include "window_event.hpp"
+
+struct GLFWwindow;
 
 namespace NoctisEngine
 {
@@ -15,24 +15,24 @@ class NCENG_API Window {
 public:
     Window(int width, int height, const std::string &title);
 
-    auto should_close() const -> bool { return glfwWindowShouldClose(m_glfwWindow); }
-    auto set_should_close(bool b) const -> void { glfwSetWindowShouldClose(m_glfwWindow, b); }
+    auto should_close() const -> bool;
+    auto set_should_close(bool b) const -> void;
 
     auto poll_events() -> void;
 
-    auto swap_buffers() const -> void { glfwSwapBuffers(m_glfwWindow); }
+    auto swap_buffers() const -> void;
 
-    auto get_time() const -> double { return glfwGetTime(); }
+    auto get_time() const -> double;
 
-    auto lock_cursor() const -> void { glfwSetInputMode(m_glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED); }
-    auto unlock_cursor() const -> void { glfwSetInputMode(m_glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL); }
+    auto lock_cursor() const -> void;
+    auto unlock_cursor() const -> void;
 
     // In seconds
-    auto delta_time() const -> double { return deltaTime_; }
+    auto delta_time() const -> double;
 
-    auto set_title(const std::string &newTitle) const -> void { glfwSetWindowTitle(m_glfwWindow, newTitle.c_str()); }
+    auto set_title(const std::string &newTitle) const -> void;
 
-    auto get_events() -> std::queue<WindowEvent> & { return events_; }
+    auto get_events() -> std::queue<WindowEvent> &;
 
 private:
     GLFWwindow *m_glfwWindow = nullptr;
