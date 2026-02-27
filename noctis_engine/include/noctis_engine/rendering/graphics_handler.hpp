@@ -18,6 +18,8 @@ public:
     auto set_clear_screen_color(Color col) -> void;
     auto set_throw_on_err(bool b) -> void;
 
+    auto set_viewport_size(int w, int h) -> void;
+
 private:
     Color clearScrCol_;
     bool throwOnErr_ = false;

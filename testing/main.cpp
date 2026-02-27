@@ -1,6 +1,5 @@
 #include <noctis_engine/rendering/shader.hpp>
 #include <noctis_engine/rendering/camera.hpp>
-#include <noctis_engine/rendering/window.hpp>
 #include <noctis_engine/rendering/graphics_handler.hpp>
 #include <noctis_engine/input/input_system.hpp>
 #include <noctis_engine/core/logging.hpp>

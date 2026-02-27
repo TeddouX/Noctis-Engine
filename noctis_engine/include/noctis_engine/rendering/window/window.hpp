@@ -3,8 +3,10 @@
 
 #include <string>
 #include <memory>
+#include <queue>
 
-#include "../noctis_engine.hpp"
+#include "../../noctis_engine.hpp"
+#include "window_event.hpp"
 
 namespace NoctisEngine
 {
@@ -30,13 +32,19 @@ public:
 
     auto set_title(const std::string &newTitle) const -> void { glfwSetWindowTitle(m_glfwWindow, newTitle.c_str()); }
 
+    auto get_events() -> std::queue<WindowEvent> & { return events_; }
+
 private:
     GLFWwindow *m_glfwWindow = nullptr;
 
     double deltaTime_;
     double lastFrame_;
 
-    static void GLFWErrorCallback(int code, const char *desc);
+    std::queue<WindowEvent> events_;
+
+    static auto GLFWErrorCallback(int code, const char *desc) -> void;
+    static auto GLFWWindowCloseCallback(GLFWwindow *window) -> void;
+    static auto GLFWWindowResizeCallback(GLFWwindow *window, int width, int height) -> void;
 };
 
 } // namespace NoctisEngine

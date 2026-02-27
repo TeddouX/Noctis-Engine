@@ -2,7 +2,7 @@
 #include <noctis_engine/asset/asset_manager.hpp>
 #include <noctis_engine/core/application.hpp>
 #include <noctis_engine/core/scene.hpp>
-#include <noctis_engine/rendering/window.hpp>
+#include <noctis_engine/rendering/window/window.hpp>
 #include <noctis_engine/rendering/graphics_handler.hpp>
 #include <noctis_engine/rendering/mesh/mesh_manager.hpp>
 #include <noctis_engine/rendering/texture.hpp>

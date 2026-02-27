@@ -57,6 +57,10 @@ void GraphicsHandler::clear_screen() const {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+auto GraphicsHandler::set_viewport_size(int w, int h) -> void {
+    glViewport(0, 0, w, h);
+}
+
 void GraphicsHandler::OpenGLDbgMessCallback(uint32_t source, uint32_t type, uint32_t id, uint32_t severity,
         int length, const char* message, const void* userParam
 ) {

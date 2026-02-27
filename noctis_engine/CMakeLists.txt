@@ -25,6 +25,8 @@ set(NOCTIS_ENGINE_SOURCES
     "include/noctis_engine/rendering/mesh/mesh_info.hpp"
     "include/noctis_engine/rendering/mesh/mesh_manager.hpp"
     "include/noctis_engine/rendering/mesh/mesh_view.hpp"
+    "include/noctis_engine/rendering/window/window.hpp"
+    "include/noctis_engine/rendering/window/window_event.hpp"
     "include/noctis_engine/rendering/camera.hpp"
     "include/noctis_engine/rendering/command_buffer.hpp"
     "include/noctis_engine/rendering/gpu_buffer.hpp"
@@ -32,7 +34,6 @@ set(NOCTIS_ENGINE_SOURCES
     "include/noctis_engine/rendering/shader.hpp"
     "include/noctis_engine/rendering/texture.hpp"
     "include/noctis_engine/rendering/vertex.hpp"
-    "include/noctis_engine/rendering/window.hpp"
     "include/noctis_engine/noctis_engine.hpp"
 
     # -------------------
@@ -45,6 +46,7 @@ set(NOCTIS_ENGINE_SOURCES
     "src/ecs/component/transform.cpp"
     "src/rendering/material/material_manager.cpp"
     "src/rendering/mesh/mesh_manager.cpp"
+    "src/rendering/window/window.cpp"
     "src/rendering/bindless_texture.cpp"
     "src/rendering/camera.cpp"
     "src/rendering/command_buffer.cpp"
@@ -53,7 +55,6 @@ set(NOCTIS_ENGINE_SOURCES
     "src/rendering/renderer.cpp"
     "src/rendering/shader.cpp"
     "src/rendering/texture.cpp"
-    "src/rendering/window.cpp"
 )
 
 add_library(NoctisEngine SHARED ${NOCTIS_ENGINE_SOURCES})
