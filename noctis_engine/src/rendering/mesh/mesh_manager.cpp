@@ -16,17 +16,7 @@ MeshManager::MeshManager()
     verticesGPUBuf_ = GPUBuffer(1, "mesh_manager_vertices");
     indicesGPUBuf_  = GPUBuffer(1, "mesh_manager_indices");
 
-    constexpr std::string_view name = "mesh_manager_vao";
-
-    glGenVertexArrays(1, &VAO_);
-    glBindVertexArray(VAO_);
-    glObjectLabel(GL_VERTEX_ARRAY, VAO_, name.size(), name.data());
-
-    verticesGPUBuf_.bind_as(BufferType::ARRAY_BUFFER);
-
-    generate_vertex_attributes();
-
-    glBindVertexArray(0);
+    create_vao();
 }
 
 auto MeshManager::upload(const MeshInfo &mesh) -> MeshView {
@@ -68,22 +58,42 @@ auto MeshManager::bind() -> void {
     indicesGPUBuf_.bind_as(BufferType::ELEMENT_ARRAY_BUFFER);
 }
 
-auto MeshManager::generate_vertex_attributes() -> void {
+auto MeshManager::create_vao() -> void {
+    constexpr std::string_view name = "mesh_manager_vao";
+
+    // Create the VAO
+    glGenVertexArrays(1, &VAO_);
+    glBindVertexArray(VAO_);
+    glObjectLabel(GL_VERTEX_ARRAY, VAO_, name.size(), name.data());
+
+    // Set its VBO and EBO
+    glVertexArrayVertexBuffer(VAO_, 0, verticesGPUBuf_.gl_handle(), 0, sizeof(Vertex));
+    glVertexArrayElementBuffer(VAO_, indicesGPUBuf_.gl_handle());
+
+    // Specify the vertice's format
+    // Position
     glVertexAttribFormat(0, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, pos));
     glVertexAttribBinding(0, 0);
     glEnableVertexAttribArray(0);
     
+    // Normal
     glVertexAttribFormat(1, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, normal));
     glVertexAttribBinding(1, 0);
     glEnableVertexAttribArray(1);
 
+    // Tangent
     glVertexAttribFormat(2, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, tangent));
     glVertexAttribBinding(2, 0);
     glEnableVertexAttribArray(2);
 
+    // Texture coordinate
     glVertexAttribFormat(3, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, texCoords));
     glVertexAttribBinding(3, 0);
     glEnableVertexAttribArray(3);
+
+    // Unbind it
+    glBindVertexArray(0);
 }
+
 
 } // namespace NoctisEngine

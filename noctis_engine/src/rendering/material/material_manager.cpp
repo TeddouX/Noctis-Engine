@@ -1,5 +1,7 @@
 #include <rendering/material/material_manager.hpp>
+
 #include <rendering/buffer_utils.hpp>
+#include <rendering/shader_bindings.hpp>
 
 namespace NoctisEngine
 {
@@ -8,7 +10,7 @@ MaterialManager::MaterialManager()
     : currKey_(0u)
 {
     materialsSSBO_ = GPUBuffer(1, "material_manager_material_data");
-    materialsSSBO_.bind_buffer_base(BufferType::SHADER_STORAGE_BUFFER, 2);
+    materialsSSBO_.bind_buffer_base(BufferType::SHADER_STORAGE_BUFFER, ShaderBindings::MATERIALS_BUFFER_SSBO);
 }
 
 auto MaterialManager::upload(const MaterialData &data) -> MaterialKey {

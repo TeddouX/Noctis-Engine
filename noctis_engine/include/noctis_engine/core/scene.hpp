@@ -14,7 +14,8 @@ namespace NoctisEngine
 
 class NCENG_API Scene {
 public:
-    Scene(std::shared_ptr<Renderer> renderer);
+    Scene() = default;
+    ~Scene() = default;
 
     auto create_entity() -> Entity;
 
@@ -26,18 +27,15 @@ public:
     auto add_system(std::string_view name, auto (Class_::*fun)(float, entt::registry &) -> void) -> void;
 
     auto update(float dt) -> void;
-    auto render_all_entities(float dt) -> void;
 
-    auto get_registry() -> entt::registry & { return reg_; }
-    auto get_registry() const -> const entt::registry & { return reg_; }
+    auto get_all_entities() -> entt::registry & { return reg_; }
+    auto get_all_entities() const -> const entt::registry & { return reg_; }
 
 private:
     SystemStorage renderSystems_;
     SystemStorage updateSystems_;
 
     entt::registry reg_;
-
-    std::shared_ptr<Renderer> renderer_;
 };
 
 template <typename Class_>

@@ -28,7 +28,7 @@ private:
 
     // std::vector<GPUBufferBlock> freeBlocks_;
 
-    auto generate_vertex_attributes() -> void;
+    auto create_vao() -> void;
 };
 
 } // namespace NoctisEngine

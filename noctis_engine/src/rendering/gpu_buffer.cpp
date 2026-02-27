@@ -101,11 +101,15 @@ auto GPUBuffer::mapped_write(CPUBufferReadView data, size_t offset) -> void {
         );
 
     if (!map_) {
-        Log::Warn("Tried to call GPUBuffer::mapped_write to an unmmapped buffer.");
+        Log::Warn("Tried to call GPUBuffer::mapped_write on an unmmapped buffer.");
         return;
     }
 
-    std::memcpy(reinterpret_cast<std::byte *>(map_) + offset, data.data(), data.size_bytes());
+    std::memcpy(
+        reinterpret_cast<std::byte *>(map_) + offset, 
+        data.data(), 
+        data.size_bytes()
+    );
 }
 
 auto GPUBuffer::get_data(std::size_t offset, CPUBufferWriteView data) const -> void {

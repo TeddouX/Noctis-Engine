@@ -6,6 +6,7 @@
 #include <rendering/mesh/mesh_view.hpp>
 #include <ecs/component/transform.hpp>
 #include <rendering/buffer_utils.hpp>
+#include <rendering/shader_bindings.hpp>
 
 namespace NoctisEngine
 {
@@ -13,73 +14,6 @@ namespace NoctisEngine
 static auto glad_enable_disable(bool b, GLenum name) -> void {
     if (b) glEnable(name);
     else   glDisable(name);
-}
-
-struct DrawElementsIndirectCommand {
-    GLuint count;
-    GLuint instanceCount;
-    GLuint firstIndex;
-    GLint  baseVertex;
-    GLuint baseInstance;
-};
-
-struct alignas(16) Object {
-    glm::mat4 modelMat;
-    GLuint materialIdx;
-};
-
-
-Renderer::Renderer(std::shared_ptr<MeshManager> meshManager)
-    : meshManager_(meshManager)
-{
-    glEnable(GL_DEBUG_OUTPUT);
-    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-
-    glDebugMessageCallback((GLDEBUGPROC)OpenGLDbgMessCallback, this);
-
-    commandBuf_ = GPUBuffer(1, "renderer_command_buffer");
-    objectsSSBO_ = GPUBuffer(1, "renderer_object_buffer");
-}
-
-auto Renderer::render(entt::registry &reg) -> void {
-    auto view = reg.view<const Transform, const MeshView, const MaterialKey>();
-
-    std::vector<DrawElementsIndirectCommand> commands;
-    std::vector<Object> objects;
-
-    for (const auto &[entity, transform, meshView, matKey] : view.each()) {
-        commands.push_back(DrawElementsIndirectCommand{
-            .count         = static_cast<GLuint>(meshView.indicesCount),
-            .instanceCount = 1u,
-            .firstIndex    = static_cast<GLuint>(meshView.indicesOffset),
-            .baseVertex    = static_cast<GLint>(meshView.verticesOffset),
-            .baseInstance  = 0, 
-        });
-
-        objects.push_back(Object{
-            .modelMat = transform.model_matrix(),
-            .materialIdx = static_cast<GLuint>(matKey),
-        });
-    }
-
-    resize_buffer(commandBuf_, commands);
-    resize_buffer(objectsSSBO_, objects);
-
-    commandBuf_.write(get_cpu_buffer_view(commands, 0, commands.size()), 0);
-    objectsSSBO_.write(get_cpu_buffer_view(objects, 0, objects.size()), 0);
-    objectsSSBO_.bind_buffer_base(BufferType::SHADER_STORAGE_BUFFER, 1);
-
-    meshManager_->bind();
-
-    commandBuf_.bind_as(BufferType::DRAW_INDIRECT_BUFFER);
-
-    glMultiDrawElementsIndirect(
-        GL_TRIANGLES,
-        GL_UNSIGNED_INT,
-        (void*)0,
-        commands.size(),
-        0
-    );
 }
 
 auto Renderer::set_backface_culling(bool b) const -> void {
@@ -111,6 +45,18 @@ void Renderer::clear_screen() const {
 
 auto Renderer::set_viewport_size(int w, int h) -> void {
     glViewport(0, 0, w, h);
+}
+
+auto Renderer::init(std::shared_ptr<MeshManager> meshManager) -> void {
+    meshManager_ = meshManager;
+
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
+    glDebugMessageCallback((GLDEBUGPROC)OpenGLDbgMessCallback, this);
+
+    commandBuf_ = GPUBuffer(1, "renderer_command_buffer");
+    objectsSSBO_ = GPUBuffer(1, "renderer_object_buffer");
 }
 
 void Renderer::OpenGLDbgMessCallback(uint32_t source, uint32_t type, uint32_t id, uint32_t severity,
