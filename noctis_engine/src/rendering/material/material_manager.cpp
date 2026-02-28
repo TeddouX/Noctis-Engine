@@ -1,25 +1,27 @@
 #include <rendering/material/material_manager.hpp>
-
 #include <rendering/buffer_utils.hpp>
-#include <rendering/shader_bindings.hpp>
 
 namespace NoctisEngine
 {
 
 MaterialManager::MaterialManager()
     : currKey_(0u)
+    , materialOff_(0zu)
 {
-    materialsSSBO_ = GPUBuffer(1, "material_manager_material_data");
-    materialsSSBO_.bind_buffer_base(BufferType::SHADER_STORAGE_BUFFER, ShaderBindings::MATERIALS_BUFFER_SSBO);
+    materialsSSBO_ = GPUBuffer(sizeof(MaterialData), "material_manager_material_data");
+    materialsSSBO_.bind_buffer_base(BufferType::SHADER_STORAGE_BUFFER, 2);
 }
 
 auto MaterialManager::upload(const MaterialData &data) -> MaterialKey {
-    materialsCPU_.push_back(data);
-
-    if (resize_buffer(materialsSSBO_, materialsCPU_)) {
-        materialsSSBO_.write(get_cpu_buffer_view(materialsCPU_, 0, materialsCPU_.size()), 0);
-        materialsSSBO_.bind_buffer_base(BufferType::SHADER_STORAGE_BUFFER, 2);
-    }
+    copy_resize_buffer(
+        materialsSSBO_, 
+        materialsSSBO_.size() + sizeof(MaterialData), 
+        "material_manager_material_data"
+    );
+    materialsSSBO_.write(get_cpu_buffer_view(data), materialOff_);
+    materialsSSBO_.bind_buffer_base(BufferType::SHADER_STORAGE_BUFFER, 2);
+    
+    materialOff_ += sizeof(MaterialData);
     
     return currKey_++;
 }

@@ -4,7 +4,6 @@
 
 #include <core/logging.hpp>
 #include <rendering/buffer_utils.hpp>
-#include <rendering/shader_bindings.hpp>
 
 namespace NoctisEngine
 {
@@ -33,11 +32,11 @@ Camera::Camera(glm::vec3 pos,
     , up_(WORLD_UP)
     , forward_(glm::vec3{0})
     , right_(glm::normalize(glm::cross(forward_, up_)))
-    , uniformBuffer_(sizeof(CameraData), "camera_UBO")
+    , uniformBuffer_(sizeof(Camera::Data), "camera_UBO")
     , data_{ .projMat = glm::perspective(glm::radians(fov_), aspectRatio_, near_, far_) }
     , dirty_(true)
 {
-    uniformBuffer_.bind_buffer_base(BufferType::UNIFORM_BUFFER, ShaderBindings::CAMERA_DATA_UBO);
+    uniformBuffer_.bind_buffer_base(BufferType::UNIFORM_BUFFER, 0);
 }
 
 void Camera::rotate_by_clamped(float yaw, float pitch) {

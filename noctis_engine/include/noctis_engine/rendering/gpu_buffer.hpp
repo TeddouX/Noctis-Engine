@@ -66,14 +66,10 @@ public:
 
     auto get_data(std::size_t offset, CPUBufferWriteView data) const -> void;
 
-    auto get_name() const -> std::string_view;
-
 private:
     uint32_t id_{};
     size_t   size_{};
     void     *map_ = nullptr;
-
-    std::string_view name_;
 };
 
 struct GPUBufferBlock {

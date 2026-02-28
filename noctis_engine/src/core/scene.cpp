@@ -4,10 +4,18 @@
 
 namespace NoctisEngine
 {
+    
+Scene::Scene(const std::shared_ptr<MeshManager> &meshManager)
+    : renderer_(meshManager)
+{}
 
 auto Scene::create_entity() -> Entity {
     entt::entity e = reg_.create();
     return Entity{e, &reg_};
+}
+
+auto Scene::render(float dt) -> void {
+    renderer_.render(reg_);
 }
 
 auto Scene::update(float dt) -> void {

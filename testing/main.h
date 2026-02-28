@@ -2,7 +2,8 @@
 #include <noctis_engine/asset/asset_manager.hpp>
 #include <noctis_engine/core/application.hpp>
 #include <noctis_engine/core/scene.hpp>
-#include <noctis_engine/rendering/window/window.hpp>
+#include <noctis_engine/rendering/window.hpp>
+#include <noctis_engine/rendering/graphics_handler.hpp>
 #include <noctis_engine/rendering/mesh/mesh_manager.hpp>
 #include <noctis_engine/rendering/texture.hpp>
 #include <noctis_engine/rendering/camera.hpp>
@@ -62,14 +63,14 @@ public:
 
 private:
     std::shared_ptr<NoctisEngine::Window> window_;
+    NoctisEngine::GraphicsHandler graphicsHandler_;
     
     std::unique_ptr<NoctisEngine::AssetManager> assetManager_;
     NoctisEngine::TextureHandle texHandle_;
     NoctisEngine::ShaderHandle  shaderHandle_;
-    
+
     std::shared_ptr<NoctisEngine::MeshManager>     meshManager_;
-    
-    std::shared_ptr<NoctisEngine::Renderer> renderer_;
+
     NoctisEngine::MaterialManager materialManager_;
     NoctisEngine::Camera          camera_;
 
