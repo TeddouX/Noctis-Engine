@@ -36,6 +36,11 @@ public:
 protected:
     auto init(std::shared_ptr<MeshManager> meshManager) -> void;
 
+    auto render(
+        std::vector<DrawElementsIndirectCommand> commands, 
+        std::vector<ObjectData> objects
+    ) -> void;
+
     std::shared_ptr<MeshManager> meshManager_;
     GPUBuffer                    objectsSSBO_;
     GPUBuffer                    commandBuf_;

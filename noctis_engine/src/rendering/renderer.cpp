@@ -59,6 +59,30 @@ auto Renderer::init(std::shared_ptr<MeshManager> meshManager) -> void {
     objectsSSBO_ = GPUBuffer(1, "renderer_object_buffer");
 }
 
+auto Renderer::render(
+    std::vector<DrawElementsIndirectCommand> commands, 
+    std::vector<ObjectData> objects
+) -> void {
+    resize_buffer(commandBuf_, commands);
+    resize_buffer(objectsSSBO_, objects);
+
+    commandBuf_.write(get_cpu_buffer_view(commands, 0, commands.size()), 0);
+    objectsSSBO_.write(get_cpu_buffer_view(objects, 0, objects.size()), 0);
+    objectsSSBO_.bind_buffer_base(BufferType::SHADER_STORAGE_BUFFER, ShaderBindings::OBJECTS_BUFFER_SSBO);
+
+    meshManager_->bind();
+
+    commandBuf_.bind_as(BufferType::DRAW_INDIRECT_BUFFER);
+
+    glMultiDrawElementsIndirect(
+        GL_TRIANGLES,
+        GL_UNSIGNED_INT,
+        (void*)0,
+        commands.size(),
+        0
+    ); 
+}
+
 void Renderer::OpenGLDbgMessCallback(uint32_t source, uint32_t type, uint32_t id, uint32_t severity,
         int length, const char* message, const void* userParam
 ) {

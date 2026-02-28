@@ -34,24 +34,7 @@ auto Renderer3D::render_entities(entt::registry &reg) -> void {
         });
     }
 
-    resize_buffer(commandBuf_, commands);
-    resize_buffer(objectsSSBO_, objects);
-
-    commandBuf_.write(get_cpu_buffer_view(commands, 0, commands.size()), 0);
-    objectsSSBO_.write(get_cpu_buffer_view(objects, 0, objects.size()), 0);
-    objectsSSBO_.bind_buffer_base(BufferType::SHADER_STORAGE_BUFFER, ShaderBindings::OBJECTS_BUFFER_SSBO);
-
-    meshManager_->bind();
-
-    commandBuf_.bind_as(BufferType::DRAW_INDIRECT_BUFFER);
-
-    glMultiDrawElementsIndirect(
-        GL_TRIANGLES,
-        GL_UNSIGNED_INT,
-        (void*)0,
-        commands.size(),
-        0
-    ); 
+    render(commands, objects);
 }
 
 } // namespace NoctisEngine

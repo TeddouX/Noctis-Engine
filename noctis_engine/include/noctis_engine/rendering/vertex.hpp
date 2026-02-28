@@ -9,7 +9,6 @@ struct Vertex {
     glm::vec3 normal;
     glm::vec3 tangent;
     glm::vec2 texCoords;
-    // float _pad{};
 
     constexpr Vertex(glm::vec3 pos, glm::vec3 normal, glm::vec3 tangent, glm::vec2 texCoords)
         : pos(pos), normal(normal), tangent(tangent), texCoords(texCoords) {}
