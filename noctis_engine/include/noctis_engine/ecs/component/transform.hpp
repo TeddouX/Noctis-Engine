@@ -11,9 +11,9 @@ public:
     Transform(glm::vec3 position, glm::vec3 scale, glm::vec3 eulerAngles);
     Transform(glm::vec3 position, glm::vec3 scale, glm::quat rotation);
 
-    auto position() const -> const glm::vec3 &;
-    auto scale() const -> const glm::vec3 &;
-    auto rotation() const -> const glm::quat &;
+    auto position() -> glm::vec3 &;
+    auto scale() -> glm::vec3 &;
+    auto rotation() -> glm::quat &;
     auto eulerAngles() const -> glm::vec3;
 
     auto model_matrix() const -> glm::mat4;

@@ -1,7 +1,5 @@
 #include <noctis_engine/rendering/shader.hpp>
 #include <noctis_engine/rendering/camera.hpp>
-#include <noctis_engine/rendering/window.hpp>
-#include <noctis_engine/rendering/graphics_handler.hpp>
 #include <noctis_engine/input/input_system.hpp>
 #include <noctis_engine/core/logging.hpp>
 #include <noctis_engine/core/entrypoint.hpp>
@@ -21,13 +19,14 @@ TestApp::TestApp()
     : window_(800, 600, "Testing")
     , assetManager_(std::make_unique<NoctisEngine::AssetManager>())
     , meshManager_(std::make_shared<NoctisEngine::MeshManager>())
+    , renderer_{std::make_shared<NoctisEngine::Renderer>(meshManager_)}
     , camera_(glm::vec3(-5, 1, 2), 800/600, 70.f, .1f, 1000.f)
-    , scene_(meshManager_)
+    , scene_(renderer_)
 {
-    graphicsHandler_.set_clear_screen_color(NoctisEngine::Color{9, 9, 9, 255});
-    graphicsHandler_.set_backface_culling(false);
-    graphicsHandler_.set_depth_testing(true);
-    graphicsHandler_.set_throw_on_err(true);
+    renderer_->set_clear_screen_color(NoctisEngine::Color{9, 9, 9, 255});
+    renderer_->set_backface_culling(false);
+    renderer_->set_depth_testing(true);
+    renderer_->set_throw_on_err(true);
 
     shaderHandle_ = assetManager_->load_asset<NoctisEngine::Shader>("./testing/test_shader.glsl");
     shaderHandle_.expect_valid("Failed to load shader.");
@@ -69,7 +68,7 @@ auto TestApp::run() -> void {
             break;
         }
 
-        graphicsHandler_.clear_screen();
+        renderer_->clear_screen();
 
         NoctisEngine::MouseMouvement mouseMvt = NoctisEngine::InputSystem::get_mouse_mouvement();
         camera_.rotate_by_clamped(mouseMvt.xDelta * MOUSE_SENS, -mouseMvt.yDelta * MOUSE_SENS);
@@ -107,7 +106,7 @@ auto TestApp::run() -> void {
         shader->bind();
 
         scene_.update(dt);
-        scene_.render(dt);
+        scene_.render_all_entities(dt);
         
         window_.poll_events();
         window_.swap_buffers();
