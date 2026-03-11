@@ -6,7 +6,6 @@
 
 #include "../noctis_engine.hpp"
 #include "gpu_buffer.hpp"
-#include "camera_data.hpp"
 
 namespace NoctisEngine
 {
@@ -45,7 +44,13 @@ private:
     // In degrees
     float yaw_, pitch_;
 
-    CameraData data_;
+    bool dirty_;
+
+    struct Data {
+        glm::mat4x4 projMat;
+        glm::mat4x4 viewMat;
+        glm::vec4   pos;
+    } data_;
 
     auto update_view_mat() -> void;
 };

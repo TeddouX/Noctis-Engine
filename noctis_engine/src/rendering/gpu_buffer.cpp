@@ -18,7 +18,6 @@ static auto is_bindable_to_index(BufferType type) -> bool;
 
 GPUBuffer::GPUBuffer(size_t size, std::string_view name, BufferFlag flags)
     : size_(size)
-    , name_(name)
 {
     glCreateBuffers(1, &id_);
     glNamedBufferStorage(id_, size, nullptr, static_cast<GLbitfield>(flags));
@@ -101,15 +100,11 @@ auto GPUBuffer::mapped_write(CPUBufferReadView data, size_t offset) -> void {
         );
 
     if (!map_) {
-        Log::Warn("Tried to call GPUBuffer::mapped_write on an unmmapped buffer.");
+        Log::Warn("Tried to call GPUBuffer::mapped_write to an unmmapped buffer.");
         return;
     }
 
-    std::memcpy(
-        reinterpret_cast<std::byte *>(map_) + offset, 
-        data.data(), 
-        data.size_bytes()
-    );
+    std::memcpy(reinterpret_cast<std::byte *>(map_) + offset, data.data(), data.size_bytes());
 }
 
 auto GPUBuffer::get_data(std::size_t offset, CPUBufferWriteView data) const -> void {
@@ -125,10 +120,6 @@ auto GPUBuffer::get_data(std::size_t offset, CPUBufferWriteView data) const -> v
         data.size_bytes(), 
         data.data()
     );
-}
-
-auto GPUBuffer::get_name() const -> std::string_view {
-    return name_;
 }
 
 

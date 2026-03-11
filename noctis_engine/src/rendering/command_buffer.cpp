@@ -19,7 +19,7 @@ struct DrawElementsIndirectCommand {
 };
 
 CommandBuffer::CommandBuffer() {
-    buf_ = GPUBuffer(1, "command_buffer");
+    buf_ = GPUBuffer(sizeof(DrawElementsIndirectCommand), "command_buffer");
 }
 
 auto CommandBuffer::build(const entt::registry &reg) -> std::uint32_t {
@@ -41,7 +41,7 @@ auto CommandBuffer::build(const entt::registry &reg) -> std::uint32_t {
         base += meshView.verticesCount;
     }
 
-    resize_buffer(buf_, commands);
+    resize_buffer(buf_, commands, "command_buffer");
     buf_.write(get_cpu_buffer_view(commands, 0, commands.size()), 0);
 
     return commands.size();

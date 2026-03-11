@@ -11,15 +11,15 @@ Transform::Transform(glm::vec3 position, glm::vec3 scale, glm::vec3 eulerAngles)
 Transform::Transform(glm::vec3 position, glm::vec3 scale, glm::quat rotation)
     : pos_(position), scale_(scale), rot_(rotation) {}
 
-auto Transform::position() -> glm::vec3 & { 
+auto Transform::position() const -> const glm::vec3 & { 
     return pos_; 
 }
 
-auto Transform::scale() -> glm::vec3 & { 
+auto Transform::scale() const -> const glm::vec3 & { 
     return scale_; 
 }
 
-auto Transform::rotation() -> glm::quat & { 
+auto Transform::rotation() const -> const glm::quat & { 
     return rot_; 
 }
 
@@ -32,10 +32,14 @@ auto Transform::model_matrix() const -> glm::mat4 {
 
     modelMatrix = glm::translate(modelMatrix, pos_);
 
+    // Log::Debug("Translation mat: {}", glm::translate(glm::mat4{1}, glm::vec3{10, 11, 12}));
+
     glm::mat4 rotationMatrix = glm::toMat4(rot_);
     modelMatrix *= rotationMatrix;
     
     modelMatrix = glm::scale(modelMatrix, scale_);
+
+    // Log::Debug("Position: {}\nRotation: {}\nScale: {}\nMatrix: {}", pos_, rot_, scale_, modelMatrix);
 
     return modelMatrix;
 }

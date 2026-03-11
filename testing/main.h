@@ -2,11 +2,13 @@
 #include <noctis_engine/asset/asset_manager.hpp>
 #include <noctis_engine/core/application.hpp>
 #include <noctis_engine/core/scene.hpp>
-#include <noctis_engine/rendering/window/window.hpp>
+#include <noctis_engine/rendering/window.hpp>
+#include <noctis_engine/rendering/graphics_handler.hpp>
 #include <noctis_engine/rendering/mesh/mesh_manager.hpp>
 #include <noctis_engine/rendering/texture.hpp>
 #include <noctis_engine/rendering/camera.hpp>
 #include <noctis_engine/rendering/gpu_buffer.hpp>
+#include <noctis_engine/debug/debug_ui.hpp>
 
 
 constexpr float MOUSE_SENS = 1.0f/10.0f;
@@ -60,20 +62,19 @@ public:
     auto run() -> void override;
 
 private:
-    NoctisEngine::Window window_;
+    std::shared_ptr<NoctisEngine::Window> window_;
+    NoctisEngine::GraphicsHandler graphicsHandler_;
     
     std::unique_ptr<NoctisEngine::AssetManager> assetManager_;
     NoctisEngine::TextureHandle texHandle_;
     NoctisEngine::ShaderHandle  shaderHandle_;
-    
+
     std::shared_ptr<NoctisEngine::MeshManager>     meshManager_;
-    
-    std::shared_ptr<NoctisEngine::Renderer> renderer_;
+
     NoctisEngine::MaterialManager materialManager_;
     NoctisEngine::Camera          camera_;
 
     NoctisEngine::Scene scene_;
 
-    double timeAcc_{};
-    int frameCount_{};
+    NoctisEngine::DebugUI debugUI_;
 };
