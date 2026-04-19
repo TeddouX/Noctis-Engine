@@ -8,6 +8,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/glad)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/glfw)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/glm)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/stb)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/imgui)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/noctis_engine)
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/testing)

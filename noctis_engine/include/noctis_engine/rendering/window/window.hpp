@@ -34,6 +34,8 @@ public:
 
     auto get_events() -> std::queue<WindowEvent> &;
 
+    auto glfw_ptr() -> GLFWwindow *;
+
 private:
     GLFWwindow *m_glfwWindow = nullptr;
 

@@ -92,6 +92,10 @@ auto Window::poll_events() -> void {
 	lastFrame_ = currentFrame;
 }
 
+auto Window::glfw_ptr() -> GLFWwindow * {
+    return m_glfwWindow;
+}
+
 void Window::GLFWErrorCallback(int code, const char *desc) {
     Log::Error("GLFW error: {}", desc);
 }

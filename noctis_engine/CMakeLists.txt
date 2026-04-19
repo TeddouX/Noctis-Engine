@@ -13,6 +13,9 @@ set(NOCTIS_ENGINE_SOURCES
     "include/noctis_engine/core/assert.hpp"
     "include/noctis_engine/core/entrypoint.hpp"
     "include/noctis_engine/core/logging.hpp"
+    "include/noctis_engine/debug/widget/debug_widget.hpp"
+    "include/noctis_engine/debug/widget/stats_widget.hpp"
+    "include/noctis_engine/debug/debug_ui.hpp"
     "include/noctis_engine/ecs/component/transform.hpp"
     "include/noctis_engine/ecs/ecs.hpp"
     "include/noctis_engine/ecs/entity.hpp"
@@ -50,6 +53,8 @@ set(NOCTIS_ENGINE_SOURCES
     "src/asset/asset_manager.cpp"
     "src/input/input_system.cpp"
     "src/core/scene.cpp"
+    "src/debug/widget/stats_widget.cpp"
+    "src/debug/debug_ui.cpp"
     "src/ecs/component/sprite2D.cpp"
     "src/ecs/component/transform.cpp"
     "src/ecs/component/transform2D.cpp"
@@ -74,6 +79,7 @@ add_library(NoctisEngine SHARED ${NOCTIS_ENGINE_SOURCES})
 target_link_libraries(NoctisEngine
     EnTT::EnTT
     glm::glm
+    ImGui
     glfw
     Glad
     stb
