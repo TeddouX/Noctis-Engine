@@ -23,33 +23,47 @@ static auto create_handle(
 
 template <typename AssetType_>
 static auto load_with_cache(
-    std::unordered_map<std::filesystem::path, AssetHandle<AssetType_>> &cache,
+    std::unordered_map<std::string, AssetHandle<AssetType_>> &cache,
     std::vector<AssetType_> &storage,
-    const std::filesystem::path &path,
     const std::string &name,
     std::function<std::optional<AssetType_> (void)> loader,
     std::string_view assetKind) -> AssetHandle<AssetType_> {
 
-    const std::string filename = path.filename().string();
-
-    if (auto it = cache.find(path); it != cache.end()) {
-        Log::Debug("Loaded {} '{}' from cache", assetKind, filename);
+    if (auto it = cache.find(name); it != cache.end()) {
+        Log::Debug("Loaded {} '{}' from cache. Check for duplicate uploads.", assetKind, name);
         return it->second;
     }
 
     std::optional<AssetType_> asset = loader();
     if (!asset) {
-        Log::Error("Failed to load {} '{}'", assetKind, filename);
+        Log::Error("Failed to load {} '{}'", assetKind, name);
         return AssetHandle<AssetType_>{};
     }
 
     Log::Debug("Successfully loaded {} '{}'", assetKind, name);
 
     auto handle = create_handle(storage, asset.value());
-    cache.emplace(path, handle);
+    cache.emplace(name, handle);
 
     return handle;
 }
+
+
+AssetManager::AssetManager() 
+    : meshManager_(std::make_shared<MeshManager>())
+    , materialManager_(std::make_shared<MaterialManager>())
+{}
+
+
+auto AssetManager::get_mesh_manager() -> std::shared_ptr<MeshManager> {
+    return meshManager_;
+}
+
+
+auto AssetManager::get_material_manager() -> std::shared_ptr<MaterialManager> {
+    return materialManager_;
+}
+
 
 auto AssetManager::load_texture(
     const std::filesystem::path &path, 
@@ -58,7 +72,6 @@ auto AssetManager::load_texture(
     return load_with_cache<Texture>(
         textureCache_,
         textures_,
-        path, 
         name, 
         [&] -> std::optional<Texture> { 
             return Internal::load_texture(path, name); 
@@ -67,6 +80,7 @@ auto AssetManager::load_texture(
     );
 }
 
+
 auto AssetManager::load_shader(
     const std::filesystem::path &path, 
     const std::string &name) -> ShaderHandle {
@@ -74,7 +88,6 @@ auto AssetManager::load_shader(
     return load_with_cache<Shader>(
         shaderCache_,
         shaders_,
-        path, 
         name, 
         [&] -> std::optional<Shader> { 
             std::ifstream ifs;
@@ -88,6 +101,34 @@ auto AssetManager::load_shader(
             return Shader{fileContents, name};
         }, 
         "shader"
+    );
+}
+
+
+auto AssetManager::load_mesh_from_memory(const std::string &name, MeshInfo meshInfo) -> MeshHandle {
+    return load_with_cache<MeshView>(
+        meshCache_,
+        meshViews_,
+        name,
+        [&](void) -> std::optional<MeshView> {
+            auto meshView = meshManager_->upload(meshInfo);
+            return meshView;
+        },
+        "mesh"
+    );
+}
+
+
+auto AssetManager::load_material_from_memory(const std::string &name, MaterialData matData) -> MaterialHandle {
+    return load_with_cache<MaterialKey>(
+        materialCache_,
+        materialKeys_,
+        name,
+        [&](void) -> std::optional<MaterialKey> {
+            auto matHandle = materialManager_->upload(matData);
+            return matHandle;
+        },
+        "material"
     );
 }
 

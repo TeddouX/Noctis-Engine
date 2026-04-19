@@ -3,6 +3,7 @@
 #include "../rendering/texture.hpp"
 #include "../core/exception.hpp"
 
+
 namespace NoctisEngine
 {
 
@@ -14,8 +15,12 @@ struct AssetHandle {
     auto expect_valid(const std::string &mess) -> void;
 };
 
+
 using TextureHandle = AssetHandle<Texture>;
 using ShaderHandle = AssetHandle<Shader>;
+using MaterialHandle = AssetHandle<MaterialKey>;
+using MeshHandle = AssetHandle<MeshView>;
+
 
 template <typename AssetType_>
 auto AssetHandle<AssetType_>::is_valid() -> bool {
