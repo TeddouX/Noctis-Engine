@@ -19,12 +19,9 @@ public:
 
     auto create_entity() -> Entity;
 
-    template <typename Class_>
-        requires(
-            std::is_base_of_v<ISystem, Class_> && 
-            std::is_default_constructible_v<Class_>
-        )
-    auto add_system(std::string_view name, auto (Class_::*fun)(float, entt::registry &) -> void) -> void;
+    template <typename System_, typename... Args_>
+    requires(std::is_base_of_v<ISystemBase, System_>)
+    auto add_update_system(Args_ &&...args) -> void;
 
     auto update(float dt) -> void;
 
@@ -32,19 +29,16 @@ public:
     auto get_all_entities() const -> const entt::registry & { return reg_; }
 
 private:
-    SystemStorage renderSystems_;
-    SystemStorage updateSystems_;
-
     entt::registry reg_;
+
+    SystemStorage updateSystems_;
 };
 
-template <typename Class_>
-    requires(
-        std::is_base_of_v<ISystem, Class_> && 
-        std::is_default_constructible_v<Class_>
-    )
-auto Scene::add_system(std::string_view name, auto (Class_::*fun)(float, entt::registry &) -> void) -> void {
-    updateSystems_.add_system(name, fun);
+
+template <typename System_, typename... Args_>
+requires(std::is_base_of_v<ISystemBase, System_>)
+auto Scene::add_update_system(Args_ &&...args) -> void {
+    updateSystems_.add_system<System_>(std::forward<Args_>(args)...);
 }
 
 } // namespace NoctisEngine

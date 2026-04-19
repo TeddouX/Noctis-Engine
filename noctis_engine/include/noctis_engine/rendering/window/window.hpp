@@ -13,7 +13,7 @@ namespace NoctisEngine
 
 class NCENG_API Window {
 public:
-    Window(int width, int height, const std::string &title);
+    Window(std::uint32_t width, std::uint32_t height, const std::string &title);
 
     auto should_close() const -> bool;
     auto set_should_close(bool b) const -> void;

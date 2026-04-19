@@ -53,6 +53,7 @@ set(NOCTIS_ENGINE_SOURCES
     "src/ecs/component/sprite2D.cpp"
     "src/ecs/component/transform.cpp"
     "src/ecs/component/transform2D.cpp"
+    "src/ecs/system/system_storage.cpp"
     "src/rendering/2d/camera2D.cpp"
     "src/rendering/2d/renderer2D.cpp"
     "src/rendering/material/material_manager.cpp"

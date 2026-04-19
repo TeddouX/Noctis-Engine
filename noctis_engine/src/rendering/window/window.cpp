@@ -16,7 +16,7 @@ static auto get_window_ptr(GLFWwindow *glfwWindow) -> Window * {
     return static_cast<Window *>(glfwGetWindowUserPointer(glfwWindow));
 }
 
-Window::Window(int width, int height, const std::string &title) 
+Window::Window(std::uint32_t width, std::uint32_t height, const std::string &title) 
     : deltaTime_(0.0), lastFrame_(0.0)
 {
     glfwInit();
@@ -27,7 +27,7 @@ Window::Window(int width, int height, const std::string &title)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
     
-    m_glfwWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+    m_glfwWindow = glfwCreateWindow((int)width, (int)height, title.c_str(), nullptr, nullptr);
 
     if (!m_glfwWindow)
         throw Exception("Failed to create a window.");

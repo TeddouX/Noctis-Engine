@@ -8,7 +8,7 @@ namespace NoctisEngine
  
 class NCENG_API Camera2D {
 public:
-    Camera2D(float frustumWidth, float frustumHeight, float near, float far);
+    Camera2D(float frustumWidth, float frustumHeight, float near = -1000.f, float far = 1000.f);
     ~Camera2D() = default;
 
     auto upload_data() -> void;

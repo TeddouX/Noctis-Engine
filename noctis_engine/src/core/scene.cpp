@@ -11,7 +11,7 @@ auto Scene::create_entity() -> Entity {
 }
 
 auto Scene::update(float dt) -> void {
-    for (const auto &fun : updateSystems_.get_functions())
+    for (const auto &fun : updateSystems_.get_update_functions())
         fun(dt, reg_);
 }
 
