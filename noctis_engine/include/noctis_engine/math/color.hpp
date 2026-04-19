@@ -20,10 +20,10 @@ public:
     constexpr auto blue() const -> uint8_t { return m_b; }
     constexpr auto alpha() const -> uint8_t { return m_a; }
 
-    constexpr auto red_f() const -> float { return m_r / 255; }
-    constexpr auto green_f() const -> float { return m_g / 255; }
-    constexpr auto blue_f() const -> float { return m_b / 255; }
-    constexpr auto alpha_f() const -> float { return m_a / 255; }
+    constexpr auto red_f() const -> float { return (float)m_r / 255; }
+    constexpr auto green_f() const -> float { return (float)m_g / 255; }
+    constexpr auto blue_f() const -> float { return (float)m_b / 255; }
+    constexpr auto alpha_f() const -> float { return (float)m_a / 255; }
 
     constexpr auto to_floats() const -> glm::vec4 { 
         return glm::vec4{red_f(), green_f(), blue_f(), alpha_f()};

@@ -25,7 +25,12 @@ auto Renderer::set_depth_testing(bool b) const -> void {
 }
 
 auto Renderer::set_clear_screen_color(Color col) -> void {
-    clearScrCol_ = col;
+    glClearColor(
+        col.red_f(), 
+        col.green_f(), 
+        col.blue_f(), 
+        col.alpha_f()
+    );
 }
 
 auto Renderer::set_throw_on_err(bool b) -> void {
@@ -33,13 +38,6 @@ auto Renderer::set_throw_on_err(bool b) -> void {
 }
 
 void Renderer::clear_screen() const {
-    glClearColor(
-        clearScrCol_.red_f(), 
-        clearScrCol_.green_f(), 
-        clearScrCol_.blue_f(), 
-        clearScrCol_.alpha_f()
-    );
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -47,11 +45,22 @@ auto Renderer::set_viewport_size(int w, int h) -> void {
     glViewport(0, 0, w, h);
 }
 
+auto Renderer::set_blend(bool b) -> void {
+    glad_enable_disable(b, GL_BLEND);
+}
+
+auto Renderer::set_blend_func(BlendFunc sFactor, BlendFunc dFactor) -> void {
+    glBlendFunc(static_cast<GLenum>(sFactor), static_cast<GLenum>(dFactor));
+}
+
 auto Renderer::init(std::shared_ptr<MeshManager> meshManager) -> void {
     meshManager_ = meshManager;
 
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 
     glDebugMessageCallback((GLDEBUGPROC)OpenGLDbgMessCallback, this);
 

@@ -12,6 +12,7 @@ public:
 
     auto upload(const MaterialData &data) -> MaterialKey;
     auto get_material(MaterialKey key) -> MaterialData;
+    auto update_material(MaterialKey key, const MaterialData &newData) -> void;
 
 private:
     std::vector<MaterialData> materialsCPU_;

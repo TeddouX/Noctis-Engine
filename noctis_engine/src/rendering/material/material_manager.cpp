@@ -24,14 +24,20 @@ auto MaterialManager::upload(const MaterialData &data) -> MaterialKey {
     return currKey_++;
 }
 
-auto MaterialManager::get_material(MaterialKey key) -> MaterialData {
-    size_t idxBytes = key * sizeof(MaterialData);
-    if (idxBytes > materialsSSBO_.size())
+
+auto MaterialManager::update_material(MaterialKey key, const MaterialData &newData) -> void {
+    size_t offsetBytes = key * sizeof(MaterialData);
+    if (offsetBytes > materialsSSBO_.size())
         throw Exception("Key {} is invalid", key);
 
-    MaterialData data{};
-    materialsSSBO_.get_data(idxBytes, get_cpu_buffer_view(data));
-    return data;
+    materialsSSBO_.write(get_cpu_buffer_view(newData), offsetBytes);
+}
+
+
+auto MaterialManager::get_material(MaterialKey key) -> MaterialData {
+    if (key >= materialsCPU_.size())
+        throw Exception("Key {} is invalid", key);
+    return materialsCPU_[key];
 }
 
 } // namespace NoctisEngine
