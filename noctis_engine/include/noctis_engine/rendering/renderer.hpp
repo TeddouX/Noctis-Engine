@@ -19,7 +19,7 @@ struct DrawElementsIndirectCommand {
 };
 
 
-struct ObjectData {
+struct alignas(16) ObjectData {
     glm::mat4     modelMat;
     std::uint32_t materialIdx;
 };

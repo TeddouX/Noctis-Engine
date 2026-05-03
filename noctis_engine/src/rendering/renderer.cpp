@@ -7,6 +7,7 @@
 #include <ecs/component/transform.hpp>
 #include <rendering/buffer_utils.hpp>
 #include <rendering/shader_bindings.hpp>
+#include <core/exception.hpp>
 
 namespace NoctisEngine
 {
@@ -92,6 +93,9 @@ auto Renderer::render_entities(entt::registry &reg) -> void {
 
     // Instanced rendered entities
     if (!irEntities_.empty()) {
+        if (irEntities_.size() != irgMeshViews_.size())
+            throw Exception("There isn't a mesh view set for every IRG. Make sure to call Renderer::set_irg_mesh_view for every IRG.");
+
         std::vector<DrawElementsIndirectCommand> irCommands;
         for (auto &meshView : irgMeshViews_) {
             irCommands.push_back(DrawElementsIndirectCommand{

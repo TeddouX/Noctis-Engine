@@ -4,7 +4,7 @@
 namespace NoctisEngine
 {
     
-struct CameraData {
+struct alignas(16) CameraData {
     glm::mat4x4 projMat;
     glm::mat4x4 viewMat;
     glm::vec4   pos;
