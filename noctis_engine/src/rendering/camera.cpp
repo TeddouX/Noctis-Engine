@@ -36,7 +36,7 @@ Camera::Camera(glm::vec3 pos,
     , uniformBuffer_(sizeof(CameraData), "camera_UBO")
     , data_{ .projMat = glm::perspective(glm::radians(fov_), aspectRatio_, near_, far_) }
 {
-    uniformBuffer_.bind_buffer_base(BufferType::UNIFORM_BUFFER, ShaderBindings::CAMERA_DATA_UBO);
+    uniformBuffer_.bind_buffer_base(BufferTarget::UNIFORM_BUFFER, ShaderBindings::CAMERA_DATA_UBO);
 }
 
 void Camera::rotate_by_clamped(float yaw, float pitch) {

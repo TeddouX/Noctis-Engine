@@ -90,10 +90,13 @@ public:
 
     auto render_entities(entt::registry &reg) -> void;
 
-protected:
+private:
     std::shared_ptr<MeshManager> meshManager_;
     GPUBuffer                    objectsSSBO_;
     GPUBuffer                    commandBuf_;
+
+    ObjectData                  *mappedObjectsSSBO_ = nullptr;
+    DrawElementsIndirectCommand *mappedCommandBuf_  = nullptr;
 
     std::vector<std::vector<entt::entity>> irEntities_;
     std::vector<MeshView> irgMeshViews_;
@@ -101,7 +104,6 @@ protected:
 
     bool throwOnErr_ = false;
 
-private:
     static void OpenGLDbgMessCallback(uint32_t source, uint32_t type, uint32_t id, uint32_t severity,
         int length, const char* message, const void* userParam);
 };

@@ -52,9 +52,9 @@ auto MeshManager::upload(const MeshInfo &mesh) -> MeshView {
     return mv;
 }
 
-auto MeshManager::bind() -> void {
+auto MeshManager::bind_vertex_array() -> void {
     glBindVertexArray(VAO_);
-    indicesGPUBuf_.bind_as(BufferType::ELEMENT_ARRAY_BUFFER);
+    indicesGPUBuf_.bind_as(BufferTarget::ELEMENT_ARRAY_BUFFER);
 }
 
 auto MeshManager::create_vao() -> void {

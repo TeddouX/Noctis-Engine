@@ -15,7 +15,7 @@ Camera2D::Camera2D(float frustumWidth, float frustumHeight, float near, float fa
     , uniformBuffer_{sizeof(CameraData), "camera2D_ubo"}
     , pos_{0}
 {
-    uniformBuffer_.bind_buffer_base(BufferType::UNIFORM_BUFFER, ShaderBindings::CAMERA_DATA_UBO);
+    uniformBuffer_.bind_buffer_base(BufferTarget::UNIFORM_BUFFER, ShaderBindings::CAMERA_DATA_UBO);
 }
 
 auto Camera2D::upload_data() -> void {

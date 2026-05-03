@@ -13,8 +13,7 @@
 namespace NoctisEngine
 {
     
-static auto opengl_buffer_type(BufferType type) -> GLenum;
-static auto is_bindable_to_index(BufferType type) -> bool;
+static auto is_bindable_to_index(BufferTarget type) -> bool;
 
 GPUBuffer::GPUBuffer(size_t size, std::string_view name, BufferFlag flags)
     : size_(size)
@@ -45,18 +44,18 @@ auto GPUBuffer::copy_to(GPUBuffer &other) -> void {
     glCopyNamedBufferSubData(id_, other.id_, 0, 0, size_);
 }
 
-auto GPUBuffer::bind_as(BufferType type) const -> void {
-    glBindBuffer(opengl_buffer_type(type), id_);
+auto GPUBuffer::bind_as(BufferTarget type) const -> void {
+    glBindBuffer(static_cast<GLenum>(type), id_);
 }
 
-auto GPUBuffer::bind_buffer_base(BufferType type, uint32_t bindPoint) const -> void {
+auto GPUBuffer::bind_buffer_base(BufferTarget type, uint32_t bindPoint) const -> void {
     if (!is_bindable_to_index(type))
         throw Exception("BufferType '{}' is not bindable to an index.", type);
 
-    glBindBufferBase(opengl_buffer_type(type), bindPoint, id_);
+    glBindBufferBase(static_cast<GLenum>(type), bindPoint, id_);
 }
 
-auto GPUBuffer::bind_buffer_range(BufferType type, uint32_t bindPoint, size_t offset, size_t size) const -> void {
+auto GPUBuffer::bind_buffer_range(BufferTarget type, uint32_t bindPoint, size_t offset, size_t size) const -> void {
     if (!is_bindable_to_index(type))
         throw Exception("BufferType '{}' is not bindable to an index.", type);
 
@@ -66,7 +65,7 @@ auto GPUBuffer::bind_buffer_range(BufferType type, uint32_t bindPoint, size_t of
             size, offset, size_
         );
 
-    glBindBufferRange(opengl_buffer_type(type), bindPoint, id_, offset, size);
+    glBindBufferRange(static_cast<GLenum>(type), bindPoint, id_, offset, size);
 }
 
 auto GPUBuffer::size() const -> size_t {
@@ -83,14 +82,18 @@ auto GPUBuffer::delete_gpu() -> void {
     glDeleteBuffers(1, &id_);
 }
 
-auto GPUBuffer::map(bool readable) -> void {
-    map_ = glMapNamedBuffer(id_, readable ? GL_READ_WRITE : GL_WRITE_ONLY);
+auto GPUBuffer::map(GPUBufMapAccess access) -> void * {
+    map_ = glMapNamedBuffer(id_, static_cast<GLenum>(access));
     if (!map_)
         throw Exception("Failed to map buffer.");
+
+    mapAccess_ = access;
+    return map_;
 }
 
 auto GPUBuffer::unmap() -> void {
     glUnmapNamedBuffer(id_);
+    map_ = nullptr;
 }
 
 auto GPUBuffer::mapped_write(CPUBufferReadView data, size_t offset) -> void {
@@ -110,6 +113,14 @@ auto GPUBuffer::mapped_write(CPUBufferReadView data, size_t offset) -> void {
         data.data(), 
         data.size_bytes()
     );
+}
+
+auto GPUBuffer::is_mapped() const -> bool {
+    return map_ != nullptr;
+}
+
+auto GPUBuffer::get_map_access() const -> GPUBufMapAccess {
+    return mapAccess_;
 }
 
 auto GPUBuffer::get_data(std::size_t offset, CPUBufferWriteView data) const -> void {
@@ -132,9 +143,9 @@ auto GPUBuffer::get_name() const -> std::string_view {
 }
 
 
-NCENG_API auto to_string(BufferType type) -> std::string {
+NCENG_API auto to_string(BufferTarget type) -> std::string {
     switch (type) {
-        using enum BufferType;
+        using enum BufferTarget;
         case ARRAY_BUFFER:              return "ARRAY_BUFFER"; 
         case ATOMIC_COUNTER_BUFFER:     return "ATOMIC_COUNTER_BUFFER"; 
         case COPY_READ_BUFFER:          return "COPY_READ_BUFFER"; 
@@ -150,35 +161,13 @@ NCENG_API auto to_string(BufferType type) -> std::string {
         case TRANSFORM_FEEDBACK_BUFFER: return "TRANSFORM_FEEDBACK_BUFFER"; 
         case UNIFORM_BUFFER:            return "UNIFORM_BUFFER";
         default:
-            throw Exception("Unsupported BufferType: {}", static_cast<int>(type));
+            throw Exception("Unsupported BufferTarget: {}", static_cast<int>(type));
     }
 }
 
-auto opengl_buffer_type(BufferType type) -> GLenum {
+auto is_bindable_to_index(BufferTarget type) -> bool {
     switch (type) {
-        using enum BufferType;
-        case ARRAY_BUFFER:              return GL_ARRAY_BUFFER; 
-        case ATOMIC_COUNTER_BUFFER:     return GL_ATOMIC_COUNTER_BUFFER; 
-        case COPY_READ_BUFFER:          return GL_COPY_READ_BUFFER; 
-        case COPY_WRITE_BUFFER:         return GL_COPY_WRITE_BUFFER; 
-        case DISPATCH_INDIRECT_BUFFER:  return GL_DISPATCH_INDIRECT_BUFFER; 
-        case DRAW_INDIRECT_BUFFER:      return GL_DRAW_INDIRECT_BUFFER; 
-        case ELEMENT_ARRAY_BUFFER:      return GL_ELEMENT_ARRAY_BUFFER; 
-        case PIXEL_PACK_BUFFER:         return GL_PIXEL_PACK_BUFFER; 
-        case PIXEL_UNPACK_BUFFER:       return GL_PIXEL_UNPACK_BUFFER; 
-        case QUERY_BUFFER:              return GL_QUERY_BUFFER; 
-        case SHADER_STORAGE_BUFFER:     return GL_SHADER_STORAGE_BUFFER; 
-        case TEXTURE_BUFFER:            return GL_TEXTURE_BUFFER; 
-        case TRANSFORM_FEEDBACK_BUFFER: return GL_TRANSFORM_FEEDBACK_BUFFER; 
-        case UNIFORM_BUFFER:            return GL_UNIFORM_BUFFER;
-        default:
-            throw Exception("Unsupported BufferType: {}", static_cast<int>(type));
-    }
-}
-
-auto is_bindable_to_index(BufferType type) -> bool {
-    switch (type) {
-        using enum BufferType;
+        using enum BufferTarget;
         case ATOMIC_COUNTER_BUFFER:
         case SHADER_STORAGE_BUFFER:
         case TRANSFORM_FEEDBACK_BUFFER:

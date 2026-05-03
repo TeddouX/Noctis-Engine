@@ -12,7 +12,7 @@ public:
     MeshManager();
 
     auto upload(const MeshInfo &mesh) -> MeshView;
-    auto bind() -> void;
+    auto bind_vertex_array() -> void;
 
 private:
     std::uint32_t VAO_;

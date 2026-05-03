@@ -10,7 +10,7 @@ MaterialManager::MaterialManager()
     : currKey_(0u)
 {
     materialsSSBO_ = GPUBuffer(1, "material_manager_material_data");
-    materialsSSBO_.bind_buffer_base(BufferType::SHADER_STORAGE_BUFFER, ShaderBindings::MATERIALS_BUFFER_SSBO);
+    materialsSSBO_.bind_buffer_base(BufferTarget::SHADER_STORAGE_BUFFER, ShaderBindings::MATERIALS_BUFFER_SSBO);
 }
 
 auto MaterialManager::upload(const MaterialData &data) -> MaterialKey {
@@ -18,7 +18,7 @@ auto MaterialManager::upload(const MaterialData &data) -> MaterialKey {
 
     if (resize_buffer(materialsSSBO_, materialsCPU_)) {
         materialsSSBO_.write(get_cpu_buffer_view(materialsCPU_, 0, materialsCPU_.size()), 0);
-        materialsSSBO_.bind_buffer_base(BufferType::SHADER_STORAGE_BUFFER, 2);
+        materialsSSBO_.bind_buffer_base(BufferTarget::SHADER_STORAGE_BUFFER, 2);
     }
     
     return MaterialKey{currKey_++};

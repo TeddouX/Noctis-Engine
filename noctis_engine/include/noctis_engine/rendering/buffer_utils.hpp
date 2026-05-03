@@ -13,8 +13,17 @@ inline auto resize_buffer(GPUBuffer &buf, size_t cpuBufSize) -> bool {
         newBufSize *= 2;
     
     Log::Info("Resizing buffer '{}', {} => {}", buf.get_name(), buf.size(), newBufSize);
+
     buf.delete_gpu();
-    buf = GPUBuffer{newBufSize, buf.get_name()};
+
+    GPUBuffer newBuf{newBufSize, buf.get_name()};
+    
+    if (buf.is_mapped()) {
+        Log::Info("Remapping buffer '{}'", buf.get_name());
+        newBuf.map(buf.get_map_access());
+    }
+
+    buf = newBuf;
 
     return true;
 }

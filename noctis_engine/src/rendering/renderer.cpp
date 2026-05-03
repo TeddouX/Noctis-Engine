@@ -67,15 +67,26 @@ auto Renderer::set_blend_func(BlendFunc sFactor, BlendFunc dFactor) -> void {
 }
 
 auto Renderer::render_entities(entt::registry &reg) -> void {
-    auto group = reg.group<>(
+    auto nonIrGroup = reg.group<>(
         entt::get_t<Transform, MeshView, MaterialKey>{},
         entt::exclude_t<InstanceRenderedGroup>{}
+    );
+
+    auto irGroup = reg.group<>(
+        entt::get_t<Transform, MaterialKey, InstanceRenderedGroup>{},
+        entt::exclude_t<>{}
     );
 
     std::vector<DrawElementsIndirectCommand> commands;
     std::vector<ObjectData> objects;
 
-    group.each([&](auto &transform, auto &mv, auto &matKey) -> void {
+    commands.reserve(nonIrGroup.size() + irEntities_.size());
+    objects.reserve(nonIrGroup.size() + irGroup.size());
+
+    resize_buffer(commandBuf_, nonIrGroup.size() + irEntities_.size());
+    resize_buffer(objectsSSBO_, nonIrGroup.size() + irGroup.size());
+
+    nonIrGroup.each([&](auto &transform, auto &mv, auto &matKey) -> void {
         commands.push_back(DrawElementsIndirectCommand{
             .count = static_cast<GLuint>(mv.indicesCount),
             .instanceCount = 1u,
@@ -106,17 +117,12 @@ auto Renderer::render_entities(entt::registry &reg) -> void {
             });
         }
 
-        auto group = reg.group<>(
-            entt::get_t<Transform, MaterialKey, InstanceRenderedGroup>{},
-            entt::exclude_t<>{}
-        );
-
         auto idx = 0;
         for (auto &entities : irEntities_) {
             irCommands[idx].baseInstance = objects.size();
 
             for (auto &entity : entities) {
-                const auto &[transform, matKey] = group.get<Transform, MaterialKey>(entity);
+                const auto &[transform, matKey] = irGroup.get<Transform, MaterialKey>(entity);
 
                 irCommands[idx].instanceCount++;
                 objects.push_back(ObjectData{
@@ -129,8 +135,6 @@ auto Renderer::render_entities(entt::registry &reg) -> void {
         }
 
         commands.insert_range(commands.end(), irCommands);
-
-        // group.
     }
 
     resize_buffer(commandBuf_, commands);
@@ -139,11 +143,11 @@ auto Renderer::render_entities(entt::registry &reg) -> void {
     // TODO: Map them and write to them using a pointer
     commandBuf_.write(get_cpu_buffer_view(commands, 0, commands.size()), 0);
     objectsSSBO_.write(get_cpu_buffer_view(objects, 0, objects.size()), 0);
-    objectsSSBO_.bind_buffer_base(BufferType::SHADER_STORAGE_BUFFER, ShaderBindings::OBJECTS_BUFFER_SSBO);
+    objectsSSBO_.bind_buffer_base(BufferTarget::SHADER_STORAGE_BUFFER, ShaderBindings::OBJECTS_BUFFER_SSBO);
 
-    meshManager_->bind();
+    meshManager_->bind_vertex_array();
 
-    commandBuf_.bind_as(BufferType::DRAW_INDIRECT_BUFFER);
+    commandBuf_.bind_as(BufferTarget::DRAW_INDIRECT_BUFFER);
 
     glMultiDrawElementsIndirect(
         GL_TRIANGLES,
