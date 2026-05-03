@@ -11,6 +11,12 @@ struct GLFWwindow;
 namespace NoctisEngine
 {
 
+enum class VSyncMethod : int {
+    NO_VSYNC = 0,
+    VSYNC = 1,
+    HALF_REFRESH_RATE = 2,
+};
+
 class NCENG_API Window {
 public:
     Window(std::uint32_t width, std::uint32_t height, const std::string &title);
@@ -35,6 +41,8 @@ public:
     auto get_events() -> std::queue<WindowEvent> &;
 
     auto glfw_ptr() -> GLFWwindow *;
+
+    auto set_vsync(VSyncMethod method) -> void; 
 
 private:
     GLFWwindow *m_glfwWindow = nullptr;

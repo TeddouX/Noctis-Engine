@@ -1,7 +1,7 @@
 #pragma once
 #include <glm/mat4x4.hpp>
 
-#include "../gpu_buffer.hpp"
+#include "gpu_buffer.hpp"
 
 namespace NoctisEngine
 {

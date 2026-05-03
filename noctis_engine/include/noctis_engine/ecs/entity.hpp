@@ -15,7 +15,7 @@ public:
     {}
 
     template <typename T>
-    void add_component(T &&comp) {
+    auto add_component(T &&comp) -> void {
         using ComponentType = std::decay_t<T>;
         if (reg_->all_of<ComponentType>(entity_)) {
             Log::Warn("Tried to add the same component two times to one entity. If this is intended behaviour, use Entity::add_component_or_replace.");
@@ -26,13 +26,13 @@ public:
     }
 
     template <typename T>
-    void add_component_or_replace(T &&comp) {
+    auto add_component_or_replace(T &&comp) -> void {
         using ComponentType = std::decay_t<T>;
         reg_->emplace_or_replace<ComponentType>(entity_, std::move(comp));
     }
 
     template <typename T>
-    T &get_component() {
+    auto get_component() -> T & {
         T *ptr = reg_->try_get<T>(entity_);
         
         if (!ptr)
@@ -42,7 +42,7 @@ public:
     }
 
     template <typename T>
-    const T &get_component() const {
+    auto get_component() const -> const T & {
         const T *ptr = reg_->try_get<T>(entity_);
         
         if (!ptr)
@@ -52,8 +52,22 @@ public:
     }
 
     template <typename T>
-    void remove_component() {
+    auto try_get_component() -> T * {
+        return reg_->try_get<T>(entity_);
+    }
+
+    template <typename T>
+    auto try_get_component() const -> const T * {
+        return reg_->try_get<T>(entity_);
+    }
+
+    template <typename T>
+    auto remove_component() -> void {
         reg_->remove<T>(entity_);
+    }
+
+    auto get_raw() const -> const entt::entity & {
+        return entity_;
     }
 
 private:

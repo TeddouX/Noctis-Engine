@@ -18,6 +18,7 @@ public:
     ~Scene() = default;
 
     auto create_entity() -> Entity;
+    auto get_entity(entt::entity &rawEntity) -> Entity;
 
     template <typename System_, typename... Args_>
     requires(std::is_base_of_v<ISystemBase, System_>)

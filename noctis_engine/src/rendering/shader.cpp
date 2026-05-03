@@ -17,10 +17,10 @@ Shader::Shader(const std::string &code, const std::string &name) {
     glObjectLabel(GL_SHADER, vertShader_, -1, name.c_str());
     glObjectLabel(GL_SHADER, fragShader_, -1, name.c_str());
 
-    const std::string header = std::string(OPENGL_VERSION) + 
-R"(
-#extension GL_ARB_gpu_shader_int64 : enable
+    const std::string header = std::string(OPENGL_VERSION) + "\n" + 
+R"(#extension GL_ARB_gpu_shader_int64 : enable
 #extension GL_ARB_bindless_texture : require
+#extension GL_ARB_shader_draw_parameters : require
 #define )";
 
     const std::string vertCodeStr = header + "VERTEX\n" + code;

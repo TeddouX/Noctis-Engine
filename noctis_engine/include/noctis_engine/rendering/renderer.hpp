@@ -2,10 +2,14 @@
 #include "mesh/mesh_manager.hpp"
 #include "material/material_manager.hpp"
 #include "../ecs/ecs.hpp"
+#include "../ecs/entity.hpp"
+
+#include <cstdint>
 
 namespace NoctisEngine
 {
     
+
 struct DrawElementsIndirectCommand {
     std::uint32_t count;
     std::uint32_t instanceCount;
@@ -14,10 +18,12 @@ struct DrawElementsIndirectCommand {
     std::uint32_t baseInstance;
 };
 
-struct alignas(16) ObjectData {
+
+struct ObjectData {
     glm::mat4     modelMat;
     std::uint32_t materialIdx;
 };
+
 
 enum class BlendFunc {
     ZERO = 0, 
@@ -42,11 +48,29 @@ enum class BlendFunc {
     ONE_MINUS_CONSTANT_ALPHA = 0x8004
 };
 
+
+class InstanceRenderedGroup {
+public:
+    constexpr InstanceRenderedGroup()
+        : num_(-1)
+    {}
+
+    constexpr explicit InstanceRenderedGroup(std::uint32_t num)
+        : num_(num)
+    {}
+
+    constexpr auto is_valid() const -> bool { return num_ >= 0; } 
+    constexpr auto get() const -> int { return num_; }
+
+private:
+    int num_;
+};
+
+
 class NCENG_API Renderer {
 public:
-    virtual ~Renderer() = default;
-
-    virtual auto render_entities(entt::registry &reg) -> void = 0;
+    Renderer(std::shared_ptr<MeshManager> meshManager);
+    ~Renderer() = default;
 
     void clear_screen() const;
     auto set_backface_culling(bool b) const -> void;
@@ -58,17 +82,22 @@ public:
 
     auto set_viewport_size(int w, int h) -> void;
 
+    // create_instanced_rendered_group
+    auto create_irg() -> InstanceRenderedGroup;
+    // set_instanced_rendered_group_mesh_view
+    auto set_irg_mesh_view(InstanceRenderedGroup group, MeshView mesh) -> void;
+    auto register_ir_entity(const Entity &entity) -> void;
+
+    auto render_entities(entt::registry &reg) -> void;
+
 protected:
-    auto init(std::shared_ptr<MeshManager> meshManager) -> void;
-
-    auto render(
-        std::vector<DrawElementsIndirectCommand> commands, 
-        std::vector<ObjectData> objects
-    ) -> void;
-
     std::shared_ptr<MeshManager> meshManager_;
     GPUBuffer                    objectsSSBO_;
     GPUBuffer                    commandBuf_;
+
+    std::vector<std::vector<entt::entity>> irEntities_;
+    std::vector<MeshView> irgMeshViews_;
+    std::uint32_t numInstanceRenderedGroups_ = 0;
 
     bool throwOnErr_ = false;
 

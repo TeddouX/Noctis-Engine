@@ -4,10 +4,7 @@
 namespace NoctisEngine
 {
     
-template <typename T>
-auto resize_buffer(GPUBuffer &buf, const std::vector<T> &cpuBuf) -> bool {
-    size_t cpuBufSize = cpuBuf.size() * sizeof(T);
-
+inline auto resize_buffer(GPUBuffer &buf, size_t cpuBufSize) -> bool {
     if (buf.size() >= cpuBufSize) 
         return false;
 
@@ -18,8 +15,14 @@ auto resize_buffer(GPUBuffer &buf, const std::vector<T> &cpuBuf) -> bool {
     Log::Info("Resizing buffer '{}', {} => {}", buf.get_name(), buf.size(), newBufSize);
     buf.delete_gpu();
     buf = GPUBuffer{newBufSize, buf.get_name()};
-            
+
     return true;
+}
+
+template <typename T>
+auto resize_buffer(GPUBuffer &buf, const std::vector<T> &cpuBuf) -> bool {
+    size_t cpuBufSize = cpuBuf.size() * sizeof(T);
+    return resize_buffer(buf, cpuBufSize);
 }
 
 template <typename T>

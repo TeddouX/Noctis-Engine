@@ -10,6 +10,10 @@ auto Scene::create_entity() -> Entity {
     return Entity{e, &reg_};
 }
 
+auto Scene::get_entity(entt::entity &rawEntity) -> Entity {
+    return Entity{rawEntity, &reg_};
+}
+
 auto Scene::update(float dt) -> void {
     for (const auto &fun : updateSystems_.get_update_functions())
         fun(dt, reg_);

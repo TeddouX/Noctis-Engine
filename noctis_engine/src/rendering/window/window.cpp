@@ -96,6 +96,10 @@ auto Window::glfw_ptr() -> GLFWwindow * {
     return m_glfwWindow;
 }
 
+auto Window::set_vsync(VSyncMethod method) -> void {
+    glfwSwapInterval(static_cast<int>(method));
+}
+
 void Window::GLFWErrorCallback(int code, const char *desc) {
     Log::Error("GLFW error: {}", desc);
 }

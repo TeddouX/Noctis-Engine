@@ -28,17 +28,16 @@ auto MeshManager::upload(const MeshInfo &mesh) -> MeshView {
     verticesCPUBuf_.append_range(mesh.vertices);
     indicesCPUBuf_.append_range(mesh.indices);
 
-    if(resize_buffer(verticesGPUBuf_, verticesCPUBuf_)) {
-        verticesGPUBuf_.write(get_cpu_buffer_view(verticesCPUBuf_, 0, verticesCPUBuf_.size()), 0);
-
+    bool verticesResized = resize_buffer(verticesGPUBuf_, verticesCPUBuf_);
+    // TODO: reupload from offset
+    verticesGPUBuf_.write(get_cpu_buffer_view(verticesCPUBuf_, 0, verticesCPUBuf_.size()), 0);
+    if(verticesResized)
         glVertexArrayVertexBuffer(VAO_, 0, verticesGPUBuf_.gl_handle(), 0, sizeof(Vertex));
-    }
 
-    if (resize_buffer(indicesGPUBuf_, indicesCPUBuf_)) {
-        indicesGPUBuf_.write(get_cpu_buffer_view(indicesCPUBuf_, 0, indicesCPUBuf_.size()), 0);
-
+    bool indicesResized = resize_buffer(indicesGPUBuf_, indicesCPUBuf_);
+    indicesGPUBuf_.write(get_cpu_buffer_view(indicesCPUBuf_, 0, indicesCPUBuf_.size()), 0);
+    if (indicesResized)
         glVertexArrayElementBuffer(VAO_, indicesGPUBuf_.gl_handle());
-    }
 
     MeshView mv {
         .verticesOffset = verticesOff_ / sizeof(Vertex),

@@ -1,4 +1,4 @@
-#include "rendering/2d/camera2D.hpp"
+#include "rendering/camera2D.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/vec4.hpp>

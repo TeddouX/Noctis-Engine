@@ -8,20 +8,35 @@ namespace NoctisEngine
 class NCENG_API Transform {
 public:
     Transform() = default;
-    Transform(glm::vec3 position, glm::vec3 scale, glm::vec3 eulerAngles);
-    Transform(glm::vec3 position, glm::vec3 scale, glm::quat rotation);
+    Transform(const glm::vec3 &position, const glm::vec3 &scale, const glm::vec3 &eulerAngles);
+    Transform(const glm::vec2 &position, const glm::vec2 &scale, const glm::vec3 &eulerAngles);
 
-    auto position() -> glm::vec3 &;
-    auto scale() -> glm::vec3 &;
-    auto rotation() -> glm::quat &;
-    auto eulerAngles() const -> glm::vec3;
+    Transform(const glm::vec3 &position, const glm::vec3 &scale, const glm::quat &rotation);
+    Transform(const glm::vec2 &position, const glm::vec2 &scale, const glm::quat &rotation);
 
-    auto model_matrix() const -> glm::mat4;
+    auto set_position(const glm::vec3 &pos) -> void;
+    auto set_position(const glm::vec2 &pos) -> void;
+
+    auto set_scale(const glm::vec3 &scale) -> void;
+    auto set_scale(const glm::vec2 &scale) -> void;
+
+    auto set_rotation(const glm::quat &rot) -> void;
+    auto set_euler_angles(const glm::vec3 &eulerAngles) -> void;
+
+    auto get_position() const -> const glm::vec3 &;
+    auto get_scale() const -> const glm::vec3 &;
+    auto get_rotation() const -> const glm::quat &;
+    auto get_euler_angles() const -> glm::vec3;
+
+    auto model_matrix() const -> const glm::mat4 &;
 
 private:
     glm::vec3 pos_;
     glm::vec3 scale_;
-    glm::quat rot_;
+    glm::quat rotation_;
+
+    mutable bool        dirty_;
+    mutable glm::mat4x4 cachedModelMatrix_;
 };
 
 } // namespace NoctisEngine
