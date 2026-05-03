@@ -5,6 +5,26 @@
 namespace NoctisEngine
 {
 
+Scene::Scene() {
+    // Essential storages
+    reg_.storage<MeshView>();
+    reg_.storage<Transform>();
+    reg_.storage<MaterialKey>();
+    reg_.storage<InstanceRenderedGroup>();
+
+    // Groups used during rendering, partial owning to avoid headaches later
+    // TODO: find a way to make them full owning
+    reg_.group<>(
+        entt::get_t<Transform, MeshView, MaterialKey>{},
+        entt::exclude_t<InstanceRenderedGroup>{}
+    );
+
+    reg_.group<>(
+        entt::get_t<Transform, MaterialKey, InstanceRenderedGroup>{},
+        entt::exclude_t<>{}
+    );
+}
+
 auto Scene::create_entity() -> Entity {
     entt::entity e = reg_.create();
     return Entity{e, &reg_};

@@ -5,7 +5,6 @@
 #include "../rendering/material/material_manager.hpp"
 #include "../rendering/gpu_buffer.hpp"
 #include "../rendering/renderer.hpp"
-#include "../rendering/command_buffer.hpp"
 #include "../ecs/system/system.hpp"
 #include "../ecs/system/system_storage.hpp"
 
@@ -14,7 +13,7 @@ namespace NoctisEngine
 
 class NCENG_API Scene {
 public:
-    Scene() = default;
+    Scene();
     ~Scene() = default;
 
     auto create_entity() -> Entity;

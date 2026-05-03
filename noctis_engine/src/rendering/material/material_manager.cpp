@@ -21,23 +21,23 @@ auto MaterialManager::upload(const MaterialData &data) -> MaterialKey {
         materialsSSBO_.bind_buffer_base(BufferType::SHADER_STORAGE_BUFFER, 2);
     }
     
-    return currKey_++;
+    return MaterialKey{currKey_++};
 }
 
 
 auto MaterialManager::update_material(MaterialKey key, const MaterialData &newData) -> void {
-    size_t offsetBytes = key * sizeof(MaterialData);
+    size_t offsetBytes = key.get() * sizeof(MaterialData);
     if (offsetBytes > materialsSSBO_.size())
-        throw Exception("Key {} is invalid", key);
+        throw Exception("Key {} is invalid", key.get());
 
     materialsSSBO_.write(get_cpu_buffer_view(newData), offsetBytes);
 }
 
 
 auto MaterialManager::get_material(MaterialKey key) -> MaterialData {
-    if (key >= materialsCPU_.size())
-        throw Exception("Key {} is invalid", key);
-    return materialsCPU_[key];
+    if (key.get() >= materialsCPU_.size())
+        throw Exception("Key {} is invalid", key.get());
+    return materialsCPU_[key.get()];
 }
 
 } // namespace NoctisEngine

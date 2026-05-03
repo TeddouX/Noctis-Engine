@@ -67,29 +67,28 @@ auto Renderer::set_blend_func(BlendFunc sFactor, BlendFunc dFactor) -> void {
 }
 
 auto Renderer::render_entities(entt::registry &reg) -> void {
-    auto view = reg.view<
-        const Transform, 
-        const MeshView, 
-        const MaterialKey
-    >(entt::exclude_t<InstanceRenderedGroup>());
+    auto group = reg.group<>(
+        entt::get_t<Transform, MeshView, MaterialKey>{},
+        entt::exclude_t<InstanceRenderedGroup>{}
+    );
 
     std::vector<DrawElementsIndirectCommand> commands;
     std::vector<ObjectData> objects;
 
-    for (const auto &[entity, transform, mv, matKey] : view.each()) {
+    group.each([&](auto &transform, auto &mv, auto &matKey) -> void {
         commands.push_back(DrawElementsIndirectCommand{
-            .count         = static_cast<GLuint>(mv.indicesCount),
+            .count = static_cast<GLuint>(mv.indicesCount),
             .instanceCount = 1u,
-            .firstIndex    = static_cast<GLuint>(mv.indicesOffset),
-            .baseVertex    = static_cast<GLint>(mv.verticesOffset),
-            .baseInstance  = static_cast<GLuint>(objects.size()),
+            .firstIndex = static_cast<GLuint>(mv.indicesOffset),
+            .baseVertex = static_cast<GLint>(mv.verticesOffset),
+            .baseInstance = static_cast<GLuint>(objects.size()),
         });
 
         objects.push_back(ObjectData{
-            .modelMat    = transform.model_matrix(),
-            .materialIdx = static_cast<GLuint>(matKey),
+            .modelMat = transform.model_matrix(),
+            .materialIdx = static_cast<GLuint>(matKey.get()),
         });
-    }
+    });
 
     // Instanced rendered entities
     if (!irEntities_.empty()) {
@@ -107,14 +106,9 @@ auto Renderer::render_entities(entt::registry &reg) -> void {
             });
         }
 
-        auto group = reg.group(
-            entt::get_t<
-                Transform, 
-                MeshView, 
-                MaterialKey, 
-                InstanceRenderedGroup
-            >(), 
-            entt::exclude_t<>()
+        auto group = reg.group<>(
+            entt::get_t<Transform, MaterialKey, InstanceRenderedGroup>{},
+            entt::exclude_t<>{}
         );
 
         auto idx = 0;
@@ -122,12 +116,12 @@ auto Renderer::render_entities(entt::registry &reg) -> void {
             irCommands[idx].baseInstance = objects.size();
 
             for (auto &entity : entities) {
-                const auto &[transform, sprite, matKey] = group.get<Transform, MeshView, MaterialKey>(entity);
+                const auto &[transform, matKey] = group.get<Transform, MaterialKey>(entity);
 
                 irCommands[idx].instanceCount++;
                 objects.push_back(ObjectData{
                     .modelMat    = transform.model_matrix(),
-                    .materialIdx = static_cast<GLuint>(matKey),
+                    .materialIdx = static_cast<GLuint>(matKey.get()),
                 });
             }
 
@@ -135,6 +129,8 @@ auto Renderer::render_entities(entt::registry &reg) -> void {
         }
 
         commands.insert_range(commands.end(), irCommands);
+
+        // group.
     }
 
     resize_buffer(commandBuf_, commands);

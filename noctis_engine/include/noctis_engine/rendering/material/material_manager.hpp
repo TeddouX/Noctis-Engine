@@ -15,9 +15,9 @@ public:
     auto update_material(MaterialKey key, const MaterialData &newData) -> void;
 
 private:
-    std::vector<MaterialData> materialsCPU_;
-    GPUBuffer     materialsSSBO_;
-    std::uint32_t currKey_;
+    std::vector<MaterialData>   materialsCPU_;
+    GPUBuffer                   materialsSSBO_;
+    int                         currKey_;
 };
 
 } // namespace NoctisEngine
